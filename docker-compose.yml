@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  db:
+    image: "postgres:16-alpine"
+    container_name: diary_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"      
+
+  backend:
+    build: "./backend"  
+    container_name: fastapi_app 
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+    ports:
+      - "8000:8000" 
+
+  frontend:
+    build: "./frontend"
+    container_name: diary_web
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
