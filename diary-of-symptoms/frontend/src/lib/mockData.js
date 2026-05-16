@@ -1,0 +1,80 @@
+export const mockUser = {
+  id: 1,
+  name: "Nikola",
+  email: "nikola@codex.health",
+  plan_type: "premium",
+  weight: 72,
+  height: 178,
+  puls_is_normal: 70,
+  pressure_is_normal: "120/80",
+  locale: "en",
+  password: "demo12345",
+  created_at: "2026-04-08T09:00:00.000Z",
+};
+
+export const mockEntries = [
+  {
+    id: 101,
+    symptom: "Migraine",
+    severity: 8,
+    duration: "5h",
+    start_at: "2026-04-14T07:40:00.000Z",
+    body_state: "Throbbing headache, low focus, sensitivity to light, tired body.",
+    sleep_quality: 4,
+    sleep_hours: 5,
+    stress_level: 7,
+    notes: "Sharp pain behind the eyes after a long screen day.",
+    food_notes: "Skipped lunch, extra coffee in the afternoon.",
+    medications_taken: "Ibuprofen 400 mg",
+    ai_insights:
+      "Pattern suggests a combination of poor sleep, missed meals, and elevated stress. Consider hydration, a steadier meal rhythm, and reducing late-day stimulation before the next episode.",
+    created_at: "2026-04-14T07:40:00.000Z",
+  },
+  {
+    id: 102,
+    symptom: "Stomach discomfort",
+    severity: 5,
+    duration: "2h",
+    start_at: "2026-04-12T18:15:00.000Z",
+    body_state: "Bloating, mild pain, lower appetite.",
+    sleep_quality: 6,
+    sleep_hours: 7,
+    stress_level: 6,
+    notes: "Mild cramps in the early evening.",
+    food_notes: "Spicy dinner and sparkling water.",
+    medications_taken: "No pills",
+    ai_insights:
+      "Food timing and spicy meals appear to correlate with the discomfort. A lighter dinner and gentler hydration may help isolate the trigger.",
+    created_at: "2026-04-12T18:15:00.000Z",
+  },
+  {
+    id: 103,
+    symptom: "Shoulder tension",
+    severity: 6,
+    duration: "3h",
+    start_at: "2026-04-10T15:30:00.000Z",
+    body_state: "Tense shoulders, body fatigue after meetings.",
+    sleep_quality: 7,
+    sleep_hours: 7.5,
+    stress_level: 8,
+    notes: "Tension increased after back-to-back meetings.",
+    food_notes: "Normal meals, low water intake.",
+    medications_taken: "Magnesium",
+    ai_insights:
+      "Stress-linked muscle tension is likely. Add short posture breaks and water reminders during dense work blocks.",
+    created_at: "2026-04-10T15:30:00.000Z",
+  },
+];
+
+export const mockMedications = [
+  {
+    id: 201,
+    name: "Magnesium Glycinate",
+    dosage: "200 mg nightly",
+    diagnosis: "Migraine prevention",
+    notes: "Taken after dinner.",
+    regular_medications: ["Magnesium Glycinate"],
+    allergies: [],
+    created_at: "2026-04-03T08:00:00.000Z",
+  },
+];

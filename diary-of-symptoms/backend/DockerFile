@@ -1,0 +1,31 @@
+FROM python:3.11 AS builder
+
+WORKDIR /backend/app
+
+COPY requirements.txt .
+
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+
+
+
+FROM python:3.11-slim
+
+WORKDIR /backend/app
+
+# 1. Создаем пользователя, чтобы не сидеть под root 🛡️
+RUN useradd -m myuser
+USER myuser
+
+COPY --from=builder --chown=myuser:myuser /root/.local /home/myuser/.local
+COPY --chown=myuser:myuser . .
+
+ENV APP_DEBUG=False
+ENV PORT=8080
+
+# 2. Указываем порт и другие настройки через ENV ⚙️
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+ENV PATH=/root/.local/bin:$PATH
+CMD ["python", "main.py"]

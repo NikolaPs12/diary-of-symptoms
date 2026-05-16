@@ -1,0 +1,117 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color: #000000;
+    background: #ffffff;
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    @apply border-codex-line;
+  }
+
+  html {
+    @apply bg-codex-white;
+  }
+
+  body {
+    @apply min-h-screen bg-codex-white text-codex-black;
+    background-image:
+      linear-gradient(to right, rgba(229, 229, 229, 0.35) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(229, 229, 229, 0.35) 1px, transparent 1px);
+    background-size: 88px 88px;
+  }
+
+  button,
+  input,
+  textarea {
+    @apply outline-none;
+  }
+
+  ::selection {
+    background: #000000;
+    color: #ffffff;
+  }
+}
+
+
+@layer components {
+  .surface {
+    @apply border border-codex-line bg-codex-white;
+  }
+
+  .surface-muted {
+    @apply border border-codex-line bg-codex-panel;
+  }
+
+  .metric-digits {
+    @apply font-mono text-3xl font-medium tracking-tight md:text-4xl;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-2 border border-transparent px-3 py-2 text-sm text-codex-muted transition hover:border-codex-line hover:text-codex-black;
+  }
+
+  .nav-link-active {
+    @apply border-codex-black bg-codex-black text-codex-white hover:border-codex-black hover:text-codex-white;
+  }
+
+  .field-shell {
+    @apply border border-codex-line bg-codex-white px-4 py-3 text-sm text-codex-black placeholder:text-codex-muted;
+  }
+
+  .range-shell {
+    @apply h-2 w-full cursor-pointer appearance-none bg-codex-line;
+  }
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #000000;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #000000;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* Убираем стрелочки у инпутов типа number */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.ai-insight-content h2 {
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+.ai-insight-content ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+.ai-insight-content p {
+  margin-bottom: 0.75rem;
+}
