@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     lang: "EN",
-    appName: "Codex",
+    appName: "",
     appTitle: "Diary of Symptoms",
     appDescription:
       "Quiet monitoring for changing health patterns, symptoms, and AI-assisted observations.",
@@ -153,7 +153,7 @@ export const translations = {
   },
   ru: {
     lang: "RU",
-    appName: "Codex",
+    appName: "",
     appTitle: "Дневник симптомов",
     appDescription:
       "Спокойный мониторинг изменений состояния, симптомов и наблюдений с AI-аналитикой.",
