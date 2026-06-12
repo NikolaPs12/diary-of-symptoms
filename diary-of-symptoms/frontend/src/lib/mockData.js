@@ -1,7 +1,7 @@
 export const mockUser = {
   id: 1,
   name: "Nikola",
-  email: "nikola@codex.health",
+  email: "nikola@diary.health",
   plan_type: "premium",
   weight: 72,
   height: 178,

@@ -6,7 +6,7 @@ function QuickRangeButton({ label, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="border border-codex-line px-4 py-3 text-sm transition hover:bg-codex-black hover:text-codex-white"
+      className="border border-diary-line px-4 py-3 text-sm transition hover:bg-diary-black hover:text-diary-white"
     >
       {label}
     </button>
@@ -36,10 +36,10 @@ export default function PdfExportPage({
         <section className="surface p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
             <label className="grid gap-2">
-              <span className="text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <span className="text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.pdf.from}
               </span>
-              <div className="flex items-center gap-3 border border-codex-line px-4 py-3">
+              <div className="flex items-center gap-3 border border-diary-line px-4 py-3">
                 <CalendarDays className="h-4 w-4" />
                 <input
                   className="w-full bg-transparent text-sm outline-none"
@@ -52,10 +52,10 @@ export default function PdfExportPage({
             </label>
 
             <label className="grid gap-2">
-              <span className="text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <span className="text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.pdf.to}
               </span>
-              <div className="flex items-center gap-3 border border-codex-line px-4 py-3">
+              <div className="flex items-center gap-3 border border-diary-line px-4 py-3">
                 <CalendarDays className="h-4 w-4" />
                 <input
                   className="w-full bg-transparent text-sm outline-none"
@@ -70,7 +70,7 @@ export default function PdfExportPage({
             <button
               type="button"
               onClick={onExportRange}
-              className="inline-flex items-center justify-center gap-2 border border-codex-black bg-codex-black px-5 py-3 text-sm font-medium text-codex-white transition hover:bg-codex-white hover:text-codex-black"
+              className="inline-flex items-center justify-center gap-2 border border-diary-black bg-diary-black px-5 py-3 text-sm font-medium text-diary-white transition hover:bg-diary-white hover:text-diary-black"
             >
               <Download className="h-4 w-4" />
               {copy.pdf.generate}
@@ -84,19 +84,19 @@ export default function PdfExportPage({
           </div>
 
           {status ? (
-            <div className="mt-4 border border-codex-line bg-codex-panel px-4 py-3 text-sm">
+            <div className="mt-4 border border-diary-line bg-diary-panel px-4 py-3 text-sm">
               {status}
             </div>
           ) : null}
         </section>
 
         <aside className="surface-muted p-5">
-          <div className="text-xs uppercase tracking-[0.24em] text-codex-muted">
+          <div className="text-xs uppercase tracking-[0.24em] text-diary-muted">
             {copy.pdf.howItWorks}
           </div>
           <div className="mt-5 space-y-4 text-sm leading-6">
             {copy.pdf.steps.map((step, index) => (
-              <div key={step} className="flex gap-4 border-b border-codex-line pb-4 last:border-b-0">
+              <div key={step} className="flex gap-4 border-b border-diary-line pb-4 last:border-b-0">
                 <div className="font-mono text-sm">{String(index + 1).padStart(2, "0")}</div>
                 <div>{step}</div>
               </div>

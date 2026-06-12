@@ -39,7 +39,7 @@ function formatDate(date) {
 function loadForms(locale) {
   return {
     login: {
-      email: "nikola@codex.health",
+      email: "nikola@diary.health",
       password: "demo12345",
       locale,
     },

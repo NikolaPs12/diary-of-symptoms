@@ -4,12 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        codex: {
+        diary: {
           white: "#FFFFFF",
           panel: "#F5F5F5",
           line: "#E5E5E5",
           muted: "#737373",
           black: "#000000",
+          accent: "#4F46E5",
         },
       },
       fontFamily: {

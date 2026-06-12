@@ -15,13 +15,13 @@ export default function AuthPage({
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <div className="surface w-full max-w-xl p-6 md:p-10">
         {/* Header */}
-        <div className="mb-10 border-b border-codex-line pb-6">
+        <div className="mb-10 border-b border-diary-line pb-6">
           <div className="flex items-center justify-between gap-4">
-            <div className="text-xs uppercase tracking-[0.28em] text-codex-muted">{copy.appName}</div>
+            <div className="text-xs uppercase tracking-[0.28em] text-diary-muted">{copy.appName}</div>
             <button
               type="button"
               onClick={onToggleLocale}
-              className="border border-codex-line px-3 py-2 text-xs uppercase tracking-[0.2em] text-codex-black transition hover:bg-codex-black hover:text-codex-white"
+              className="border border-diary-line px-3 py-2 text-xs uppercase tracking-[0.2em] text-diary-black transition hover:bg-diary-black hover:text-diary-white"
             >
               {locale.toUpperCase()}
             </button>
@@ -29,7 +29,7 @@ export default function AuthPage({
           <h1 className="mt-3 text-4xl font-semibold tracking-swiss">
             {isRegister ? copy.auth.registerTitle : copy.auth.loginTitle}
           </h1>
-          <p className="mt-3 max-w-md text-sm leading-6 text-codex-muted">
+          <p className="mt-3 max-w-md text-sm leading-6 text-diary-muted">
             {isRegister ? copy.auth.registerDescription : copy.auth.loginDescription}
           </p>
         </div>
@@ -105,8 +105,8 @@ export default function AuthPage({
               <div className="grid gap-4 grid-cols-2">
                 
                 {/* Блок Пульса */}
-                <div className="field-shell flex flex-col items-center justify-center py-6 bg-white border border-codex-line">
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-codex-muted mb-4">Пульс (bpm)</span>
+                <div className="field-shell flex flex-col items-center justify-center py-6 bg-white border border-diary-line">
+                  <span className="text-[10px] uppercase tracking-[0.3em] text-diary-muted mb-4">Пульс (bpm)</span>
                   <div className="flex items-center justify-between w-full px-4">
                     <button 
                       type="button" 
@@ -138,8 +138,8 @@ export default function AuthPage({
                 </div>
 
                 {/* Блок Давления */}
-                <div className="field-shell flex flex-col items-center justify-center py-6 bg-white border border-codex-line">
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-codex-muted mb-4">Давление (АД)</span>
+                <div className="field-shell flex flex-col items-center justify-center py-6 bg-white border border-diary-line">
+                  <span className="text-[10px] uppercase tracking-[0.3em] text-diary-muted mb-4">Давление (АД)</span>
                   <div className="flex items-center justify-center font-mono text-3xl tracking-tighter">
                     <input
                       type="number"
@@ -183,33 +183,33 @@ export default function AuthPage({
           )}
 
           {error && (
-            <div className="border border-codex-black bg-codex-panel px-4 py-3 text-sm">{error}</div>
+            <div className="border border-diary-black bg-diary-panel px-4 py-3 text-sm">{error}</div>
           )}
 
           <button
             type="submit"
-            className="mt-2 border border-codex-black bg-codex-black px-4 py-3 text-sm font-medium text-codex-white transition hover:bg-codex-white hover:text-codex-black"
+            className="mt-2 border border-diary-black bg-diary-black px-4 py-3 text-sm font-medium text-diary-white transition hover:bg-diary-white hover:text-diary-black"
           >
             {isRegister ? copy.auth.register : copy.auth.login}
           </button>
         </form>
 
         {/* Footer Links */}
-        <div className="mt-6 text-sm text-codex-muted">
+        <div className="mt-6 text-sm text-diary-muted">
           {isRegister ? copy.auth.alreadyHave : copy.auth.needNew}{" "}
           <button
             type="button"
             onClick={onSwitchMode}
-            className="border-b border-codex-black text-codex-black"
+            className="border-b border-diary-black text-diary-black"
           >
             {isRegister ? copy.auth.loginInstead : copy.auth.registerInstead}
           </button>
         </div>
 
         {!isRegister && (
-          <div className="mt-8 border-t border-codex-line pt-6 text-sm text-codex-muted">
-            {copy.auth.demoAccess}: <span className="font-mono text-codex-black">nikola@codex.health</span> /{" "}
-            <span className="font-mono text-codex-black">demo12345</span>
+          <div className="mt-8 border-t border-diary-line pt-6 text-sm text-diary-muted">
+            {copy.auth.demoAccess}: <span className="font-mono text-diary-black">nikola@diary.health</span> /{" "}
+            <span className="font-mono text-diary-black">demo12345</span>
           </div>
         )}
       </div>

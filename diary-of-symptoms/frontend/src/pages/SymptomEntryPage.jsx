@@ -77,7 +77,7 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="surface grid gap-4 p-5 md:grid-cols-2">
             <div className="md:col-span-2">
-              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.entry.symptom}
               </label>
               <input
@@ -91,7 +91,7 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
             </div>
 
             <div className="md:col-span-2">
-              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.entry.bodyState}
               </label>
               <textarea
@@ -104,7 +104,7 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
             </div>
 
             <div>
-              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.entry.startedAt}
               </label>
               <input
@@ -116,7 +116,7 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
               />
             </div>
             <div>
-              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.entry.duration}
               </label>
               <input
@@ -129,7 +129,7 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
               />
             </div>
             <div>
-              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.entry.sleepHours}
               </label>
               <input
@@ -159,7 +159,7 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
 
           <div className="surface grid gap-4 p-5">
             <div>
-              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.entry.foodNotes}
               </label>
               <textarea
@@ -171,7 +171,7 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
               />
             </div>
             <div>
-              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.entry.medicationsTaken}
               </label>
               <textarea
@@ -183,7 +183,7 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
               />
             </div>
             <div>
-              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-codex-muted">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.entry.notes}
               </label>
               <textarea
@@ -198,7 +198,7 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
 
           <button
             type="submit"
-            className="inline-flex items-center gap-3 border border-codex-black bg-codex-black px-5 py-3 text-sm font-medium text-codex-white transition hover:bg-codex-white hover:text-codex-black"
+            className="inline-flex items-center gap-3 border border-diary-black bg-diary-black px-5 py-3 text-sm font-medium text-diary-white transition hover:bg-diary-white hover:text-diary-black"
           >
             <BrainCircuit className="h-4 w-4" />
             {status === "submitting" ? copy.entry.analyzing : copy.entry.analyze}
@@ -208,12 +208,12 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
 
         <aside className="space-y-4">
           <div className="surface-muted p-5">
-            <div className="text-xs uppercase tracking-[0.24em] text-codex-muted">
+            <div className="text-xs uppercase tracking-[0.24em] text-diary-muted">
               {copy.entry.structure}
             </div>
             <div className="mt-5 space-y-4">
               {copy.entry.structureItems.map((item, index) => (
-                <div key={item} className="flex gap-4 border-b border-codex-line pb-4 last:border-b-0">
+                <div key={item} className="flex gap-4 border-b border-diary-line pb-4 last:border-b-0">
                   <div className="font-mono text-sm">{String(index + 1).padStart(2, "0")}</div>
                   <div className="text-sm leading-6">{item}</div>
                 </div>
@@ -222,17 +222,17 @@ export default function SymptomEntryPage({ onSubmitEntry, copy }) {
           </div>
 
           <div className="surface p-5">
-            <div className="mb-4 text-xs uppercase tracking-[0.24em] text-codex-muted">
+            <div className="mb-4 text-xs uppercase tracking-[0.24em] text-diary-muted">
               {copy.entry.output}
             </div>
             {insight ? (
               /* ИСПРАВЛЕННЫЙ БЛОК: Отрисовываем HTML от нейронки */
               <div 
-                className="prose prose-sm max-w-none border-l-4 border-l-codex-black pl-4 text-sm leading-7"
+                className="prose prose-sm max-w-none border-l-4 border-l-diary-black pl-4 text-sm leading-7"
                 dangerouslySetInnerHTML={{ __html: insight }} 
               />
             ) : (
-              <p className="text-sm leading-6 text-codex-muted">{copy.entry.outputPlaceholder}</p>
+              <p className="text-sm leading-6 text-diary-muted">{copy.entry.outputPlaceholder}</p>
             )}
           </div>
         </aside>

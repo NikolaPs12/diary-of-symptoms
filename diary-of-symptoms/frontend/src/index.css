@@ -15,15 +15,15 @@
   }
 
   * {
-    @apply border-codex-line;
+    @apply border-diary-line;
   }
 
   html {
-    @apply bg-codex-white;
+    @apply bg-diary-white;
   }
 
   body {
-    @apply min-h-screen bg-codex-white text-codex-black;
+    @apply min-h-screen bg-diary-white text-diary-black;
     background-image:
       linear-gradient(to right, rgba(229, 229, 229, 0.35) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(229, 229, 229, 0.35) 1px, transparent 1px);
@@ -45,11 +45,11 @@
 
 @layer components {
   .surface {
-    @apply border border-codex-line bg-codex-white;
+    @apply border border-diary-line bg-diary-white;
   }
 
   .surface-muted {
-    @apply border border-codex-line bg-codex-panel;
+    @apply border border-diary-line bg-diary-panel;
   }
 
   .metric-digits {
@@ -57,19 +57,19 @@
   }
 
   .nav-link {
-    @apply flex items-center gap-2 border border-transparent px-3 py-2 text-sm text-codex-muted transition hover:border-codex-line hover:text-codex-black;
+    @apply flex items-center gap-2 border border-transparent px-3 py-2 text-sm text-diary-muted transition hover:border-diary-line hover:text-diary-black;
   }
 
   .nav-link-active {
-    @apply border-codex-black bg-codex-black text-codex-white hover:border-codex-black hover:text-codex-white;
+    @apply border-diary-black bg-diary-black text-diary-white hover:border-diary-black hover:text-diary-white;
   }
 
   .field-shell {
-    @apply border border-codex-line bg-codex-white px-4 py-3 text-sm text-codex-black placeholder:text-codex-muted;
+    @apply border border-diary-line bg-diary-white px-4 py-3 text-sm text-diary-black placeholder:text-diary-muted;
   }
 
   .range-shell {
-    @apply h-2 w-full cursor-pointer appearance-none bg-codex-line;
+    @apply h-2 w-full cursor-pointer appearance-none bg-diary-line;
   }
 }
 
