@@ -1,20 +1,24 @@
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 from .config import settings
 
-# Для асинхронности SQLite не требует check_same_thread в большинстве случаев,
-# но мы оставим логику для универсальности.
-connect_args = {"check_same_thread": False} if str(settings.database_url).startswith("sqlite") else {}
+database_url = str(settings.database_url)
 
-# 1. Создаем асинхронный движок
+if database_url.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
+elif database_url.startswith("postgresql+asyncpg"):
+    connect_args = {"timeout": 5}
+else:
+    connect_args = {}
+
 engine = create_async_engine(
-    str(settings.database_url),
+    database_url,
     connect_args=connect_args,
-    echo=True  # Включаем логи, чтобы видеть SQL-запросы в терминале
+    echo=settings.debug,
+    pool_pre_ping=True,
 )
 
-# 2. Используем async_sessionmaker (это замена старому sessionmaker)
-# expire_on_commit=False критически важно для асинхронности
 SessionLocal = async_sessionmaker(
     bind=engine,
     class_=AsyncSession,
@@ -23,11 +27,9 @@ SessionLocal = async_sessionmaker(
     expire_on_commit=False
 )
 
-# 3. Современный стиль объявления Base (SQLAlchemy 2.0)
 class Base(DeclarativeBase):
     pass
 
-# 4. Асинхронный генератор сессий для FastAPI
 async def get_db():
     async with SessionLocal() as db:
         try:
@@ -35,8 +37,11 @@ async def get_db():
         finally:
             await db.close()
 
-# 5. Асинхронная инициализация таблиц
 async def init_db():
     async with engine.begin() as conn:
-        # run_sync нужен, так как create_all — синхронный метод внутри метадаты
         await conn.run_sync(Base.metadata.create_all)
+
+        # Existing PostgreSQL tables are not altered by create_all,
+        # so we add the age column explicitly for older deployments.
+        if database_url.startswith("postgresql"):
+            await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS age INTEGER"))

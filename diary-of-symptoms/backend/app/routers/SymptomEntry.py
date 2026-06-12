@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 router = APIRouter(
     prefix="/api/symptom-entries",
-    tags=["symptom-entries"],
+    tags=["symptom-entries"]
 )
 
 

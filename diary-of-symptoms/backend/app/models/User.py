@@ -18,14 +18,15 @@ class User(Base):
     email: Mapped[str] = mapped_column(String, index=True, unique=True)
     hashed_password: Mapped[str] = mapped_column(String)
     google_id: Mapped[str | None] = mapped_column(String, unique=True, index=True, nullable=True)
+    age: Mapped[int] = mapped_column(Integer, nullable=True, default=None)
 
-    email_verified: Mapped[Boolean] = mapped_column(Boolean, default=False)
-    plan_type: Mapped[str] = mapped_column(String, default="free") # план подписки пользователя, например, "free", "premium" и т.д.
+    email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    plan_type: Mapped[str] = mapped_column(String, default="free")
 
-    weight: Mapped[int] = mapped_column(Integer)
-    height: Mapped[int] = mapped_column(Integer)
-    puls_is_normal: Mapped[int] = mapped_column(Integer)
-    pressure_is_normal: Mapped[str] = mapped_column(String)
+    weight: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    height: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    puls_is_normal: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    pressure_is_normal: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(default=func.now())
     
     medications: Mapped[List["Medication"]] = relationship("Medication", back_populates="user")

@@ -12,7 +12,7 @@ import asyncio
 
 router = APIRouter(
     prefix="/api/medications",
-    tags=["medications"],
+    tags=["medications"]
 )
 
 @router.post("/add", status_code=status.HTTP_201_CREATED, response_model=MedicationResponse)

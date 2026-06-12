@@ -8,6 +8,7 @@ export const translations = {
     nav: {
       dashboard: "Dashboard",
       entry: "Symptom Entry",
+      pdf: "PDF Export",
       profile: "Profile",
     },
     common: {
@@ -28,6 +29,7 @@ export const translations = {
       registerDescription:
         "Register a calm space for symptom tracking, your personal health card, and AI-assisted pattern recognition.",
       fullName: "Full name",
+      age: "Age",
       email: "Email",
       password: "Password",
       weight: "Weight, kg",
@@ -120,6 +122,28 @@ export const translations = {
       foodPlaceholder: "Meals, hydration, caffeine, sweets, supplements",
       medicationPlaceholder: "Ibuprofen 400 mg, magnesium, no pills, etc.",
     },
+    pdf: {
+      eyebrow: "Report Export",
+      title: "Generate PDF Report",
+      description:
+        "Choose an exact range, download one selected day, or export the latest week, month, or your full symptom history as a PDF.",
+      from: "From date",
+      to: "To date",
+      generate: "Generate PDF",
+      week: "Week",
+      month: "Month",
+      allData: "All data",
+      howItWorks: "How it works",
+      steps: [
+        "Select one exact day to generate a report only for that date.",
+        "Use Week to send a ready-made range like /pdf?start_date=2026-05-09&end_date=2026-05-16.",
+        "Use Month to export the rolling last month based on today's date.",
+        "Use All data to generate one PDF from the full history available for the current user.",
+      ],
+      statusReady: "PDF generated: {file}",
+      statusMissing: "Choose at least one date or use a quick export button.",
+      statusError: "PDF export failed.",
+    },
     card: {
       medication: "Medication",
       dosage: "Dosage",
@@ -136,6 +160,7 @@ export const translations = {
     nav: {
       dashboard: "Дашборд",
       entry: "Самочувствие",
+      pdf: "PDF отчёт",
       profile: "Профиль",
     },
     common: {
@@ -156,6 +181,7 @@ export const translations = {
       registerDescription:
         "Создайте пространство для отслеживания симптомов, личной медицинской карточки и AI-аналитики.",
       fullName: "Имя и фамилия",
+      age: "Возраст",
       email: "Почта",
       password: "Пароль",
       weight: "Вес, кг",
@@ -247,6 +273,28 @@ export const translations = {
       notesPlaceholder: "Что произошло, что изменилось и что сегодня было необычным",
       foodPlaceholder: "Еда, вода, кофеин, сладкое, добавки",
       medicationPlaceholder: "Ибупрофен 400 мг, магний, ничего не пил и т.д.",
+    },
+    pdf: {
+      eyebrow: "Экспорт отчёта",
+      title: "Генерация PDF",
+      description:
+        "Выберите точный диапазон, выгрузите один конкретный день или соберите PDF за неделю, месяц или всю историю симптомов.",
+      from: "С какой даты",
+      to: "По какую дату",
+      generate: "Сгенерировать PDF",
+      week: "Неделя",
+      month: "Месяц",
+      allData: "Все данные",
+      howItWorks: "Как это работает",
+      steps: [
+        "Можно выбрать один точный день и получить PDF только за эту дату.",
+        "Кнопка Неделя сама отправляет диапазон вроде /pdf?start_date=2026-05-09&end_date=2026-05-16.",
+        "Кнопка Месяц формирует скользящий диапазон за последний месяц от текущей даты.",
+        "Кнопка Все данные собирает один PDF по всей истории текущего пользователя.",
+      ],
+      statusReady: "PDF сформирован: {file}",
+      statusMissing: "Выберите хотя бы одну дату или используйте быструю кнопку экспорта.",
+      statusError: "Не удалось сформировать PDF.",
     },
     card: {
       medication: "Лекарство",

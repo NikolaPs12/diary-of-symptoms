@@ -37,14 +37,26 @@ export default function AuthPage({
         {/* Form */}
         <form className="grid gap-4" onSubmit={onSubmit}>
           {isRegister && (
-            <input
-              className="field-shell"
-              name="name"
-              placeholder={copy.auth.fullName}
-              value={form.name}
-              onChange={onChange}
-              required
-            />
+            <>
+              <input
+                className="field-shell"
+                name="name"
+                placeholder={copy.auth.fullName}
+                value={form.name}
+                onChange={onChange}
+                required
+              />
+
+              <input
+                className="field-shell"
+                name="age"
+                type="number"
+                min="0"
+                placeholder={copy.auth.age}
+                value={form.age}
+                onChange={onChange}
+              />
+            </>
           )}
           
           <input

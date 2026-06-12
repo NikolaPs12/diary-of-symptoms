@@ -27,6 +27,20 @@ services:
     ports:
       - "8000:8000" 
 
+  telegram_bot:
+    build: "./backend"
+    container_name: diary_bot
+    restart: always
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    environment:
+      - TOKEN=${TOKEN}
+      - BACKEND_API_BASE_URL=http://backend:8000
+    working_dir: /backend/app
+    command: python tele_bot/main.py
+
   frontend:
     build: "./frontend"
     container_name: diary_web

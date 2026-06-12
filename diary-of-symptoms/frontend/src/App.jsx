@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout";
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
+import PdfExportPage from "./pages/PdfExportPage";
 import ProfilePage from "./pages/ProfilePage";
 import SymptomEntryPage from "./pages/SymptomEntryPage";
 import {
   createSymptomEntry,
+  exportPdfReport,
   getAppSnapshot,
   loginUser,
   logoutUser,
@@ -30,27 +32,26 @@ function getInitialLocale() {
   return "en";
 }
 
+function formatDate(date) {
+  return date.toISOString().slice(0, 10);
+}
+
 function loadForms(locale) {
   return {
     login: {
       email: "nikola@codex.health",
       password: "demo12345",
-      name: "",
-      weight: "",
-      height: "",
-      medication_name: "",
-      dosage: "",
-      diagnosis: "",
-      allergies: "",
-      medication_notes: "",
       locale,
     },
     register: {
       name: "",
       email: "",
       password: "",
+      age: "",
       weight: "",
       height: "",
+      puls_is_normal: "",
+      pressure_is_normal: "",
       medication_name: "",
       dosage: "",
       diagnosis: "",
@@ -75,11 +76,23 @@ export default function App() {
   const [locale, setLocale] = useState(getInitialLocale);
   const [authForms, setAuthForms] = useState(() => loadForms(getInitialLocale()));
   const [authError, setAuthError] = useState("");
+  const [pdfRange, setPdfRange] = useState({ startDate: "", endDate: "" });
+  const [pdfStatus, setPdfStatus] = useState("");
+  const [isBootstrapping, setIsBootstrapping] = useState(true);
 
   const copy = getTranslation(locale);
 
   const refreshSnapshot = async () => {
     setSnapshot(await getAppSnapshot());
+  };
+
+  const handlePdfExport = async (exporter) => {
+    try {
+      const filename = await exporter();
+      setPdfStatus(copy.pdf.statusReady.replace("{file}", filename));
+    } catch (error) {
+      setPdfStatus(error.message || copy.pdf.statusError);
+    }
   };
 
   useEffect(() => {
@@ -91,16 +104,16 @@ export default function App() {
       navigateTo(snapshot.currentUser ? DEFAULT_ROUTE : "/login");
     }
 
-    void refreshSnapshot();
+    refreshSnapshot().finally(() => setIsBootstrapping(false));
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
   useEffect(() => {
-    if (!snapshot.currentUser && !AUTH_ROUTES.includes(route)) {
+    if (!isBootstrapping && !snapshot.currentUser && !AUTH_ROUTES.includes(route)) {
       navigateTo("/login");
     }
-  }, [route, snapshot.currentUser]);
+  }, [isBootstrapping, route, snapshot.currentUser]);
 
   useEffect(() => {
     setAuthForms((current) => ({
@@ -137,6 +150,62 @@ export default function App() {
             }}
           />
         );
+      case "/pdf":
+        return (
+          <PdfExportPage
+            copy={copy}
+            startDate={pdfRange.startDate}
+            endDate={pdfRange.endDate}
+            onDateChange={(event) => {
+              const { name, value } = event.target;
+              setPdfRange((current) => ({ ...current, [name]: value }));
+              setPdfStatus("");
+            }}
+            onExportRange={async () => {
+              if (!pdfRange.startDate && !pdfRange.endDate) {
+                setPdfStatus(copy.pdf.statusMissing);
+                return;
+              }
+
+              await handlePdfExport(() =>
+                exportPdfReport({
+                  startDate: pdfRange.startDate,
+                  endDate: pdfRange.endDate,
+                }),
+              );
+            }}
+            onExportWeek={async () => {
+              const end = new Date();
+              const start = new Date();
+              start.setDate(end.getDate() - 7);
+
+              const nextRange = {
+                startDate: formatDate(start),
+                endDate: formatDate(end),
+              };
+
+              setPdfRange(nextRange);
+              await handlePdfExport(() => exportPdfReport(nextRange));
+            }}
+            onExportMonth={async () => {
+              const end = new Date();
+              const start = new Date();
+              start.setMonth(end.getMonth() - 1);
+
+              const nextRange = {
+                startDate: formatDate(start),
+                endDate: formatDate(end),
+              };
+
+              setPdfRange(nextRange);
+              await handlePdfExport(() => exportPdfReport(nextRange));
+            }}
+            onExportAll={async () => {
+              await handlePdfExport(() => exportPdfReport({ includeAll: true }));
+            }}
+            status={pdfStatus}
+          />
+        );
       case "/dashboard":
       default:
         return (
@@ -149,7 +218,7 @@ export default function App() {
           />
         );
     }
-  }, [route, snapshot, copy]);
+  }, [route, snapshot, copy, pdfRange, pdfStatus]);
 
   const handleAuthFieldChange = (event) => {
     const { name, value } = event.target;
@@ -194,6 +263,10 @@ export default function App() {
   const handleToggleLocale = () => {
     setLocale((current) => (current === "ru" ? "en" : "ru"));
   };
+
+  if (isBootstrapping) {
+    return null;
+  }
 
   if (!snapshot.currentUser || AUTH_ROUTES.includes(route)) {
     return (

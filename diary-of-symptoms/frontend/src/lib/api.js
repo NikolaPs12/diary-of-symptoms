@@ -1,5 +1,82 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
+const AUTH_STORAGE_KEY = "diary.auth";
+
 let currentUser = null;
+let authToken = null;
+
+function loadAuthSession() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    const rawSession = window.localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!rawSession) {
+      return;
+    }
+
+    const session = JSON.parse(rawSession);
+    currentUser = session.user?.id ? session.user : null;
+    authToken = session.token ?? null;
+  } catch {
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    currentUser = null;
+    authToken = null;
+  }
+}
+
+function saveAuthSession({ user, token }) {
+  currentUser = user?.id ? user : null;
+  authToken = token ?? null;
+
+  if (typeof window !== "undefined") {
+    if (currentUser) {
+      window.localStorage.setItem(
+        AUTH_STORAGE_KEY,
+        JSON.stringify({ user: currentUser, token: authToken }),
+      );
+    } else {
+      window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+  }
+
+  return currentUser;
+}
+
+function clearAuthSession() {
+  currentUser = null;
+  authToken = null;
+
+  if (typeof window !== "undefined") {
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  }
+}
+
+function normalizeAuthResponse(response) {
+  const user = response?.user ?? response;
+  const token = response?.token ?? response?.access_token ?? null;
+
+  if (!user?.id) {
+    throw new Error("Login response does not include a user id");
+  }
+
+  return { user, token };
+}
+
+loadAuthSession();
+
+function buildQuery(params) {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      searchParams.set(key, String(value));
+    }
+  });
+
+  const query = searchParams.toString();
+  return query ? `?${query}` : "";
+}
 
 function normalizeEntry(entry) {
   return {
@@ -44,6 +121,7 @@ async function request(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     headers: {
       "Content-Type": "application/json",
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       ...(options.headers ?? {}),
     },
     ...options,
@@ -69,6 +147,38 @@ async function request(path, options = {}) {
   return response.json();
 }
 
+async function requestBlob(path, options = {}) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    headers: {
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      ...(options.headers ?? {}),
+    },
+    ...options,
+  });
+
+  if (!response.ok) {
+    let message = "Request failed";
+
+    try {
+      const errorBody = await response.json();
+      message = errorBody.detail ?? JSON.stringify(errorBody);
+    } catch {
+      message = await response.text();
+    }
+
+    throw new Error(message || "Request failed");
+  }
+
+  const blob = await response.blob();
+  const contentDisposition = response.headers.get("Content-Disposition") ?? "";
+  const filenameMatch = contentDisposition.match(/filename=\"([^\"]+)\"/);
+
+  return {
+    blob,
+    filename: filenameMatch?.[1] ?? "symptoms_report.pdf",
+  };
+}
+
 export async function getAppSnapshot() {
   if (!currentUser?.id) {
     return {
@@ -86,7 +196,7 @@ export async function getAppSnapshot() {
     request(`/api/medications?user_id=${currentUser.id}`),
   ]);
 
-  currentUser = freshUser;
+  saveAuthSession({ user: freshUser, token: authToken });
 
   const entries = entriesResponse
     .map(normalizeEntry)
@@ -106,11 +216,12 @@ export async function getAppSnapshot() {
 
 export async function loginUser({ email, password }) {
   try {
-    currentUser = await request("/api/users/login", {
+    const response = await request("/api/users/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    return currentUser;
+    const session = normalizeAuthResponse(response);
+    return saveAuthSession(session);
   } catch {
     throw new Error("Invalid email or password");
   }
@@ -122,6 +233,7 @@ export async function registerUser(formData) {
     email: formData.email,
     password: formData.password,
     plan_type: "free",
+    age: Number(formData.age) || null,
     weight: Number(formData.weight) || null,
     height: Number(formData.height) || null,
     puls_is_normal: Number(formData.puls_is_normal) || null,
@@ -130,10 +242,12 @@ export async function registerUser(formData) {
   };
 
   try {
-    currentUser = await request("/api/users/register", {
+    const response = await request("/api/users/register", {
       method: "POST",
       body: JSON.stringify(userPayload),
     });
+    const session = normalizeAuthResponse(response);
+    saveAuthSession(session);
   } catch (error) {
     if (error.message.includes("Email already registered")) {
       throw new Error("This email is already registered");
@@ -163,7 +277,7 @@ export async function registerUser(formData) {
 }
 
 export function logoutUser() {
-  currentUser = null;
+  clearAuthSession();
 }
 
 export async function createSymptomEntry(formData) {
@@ -222,4 +336,31 @@ export async function saveProfileCard(formData) {
   });
 
   return normalizeMedication(medication);
+}
+
+export async function exportPdfReport({ startDate, endDate, includeAll = false }) {
+  if (!currentUser?.id) {
+    throw new Error("User is not authenticated");
+  }
+
+  const query = includeAll
+    ? buildQuery({ user_id: currentUser.id })
+    : buildQuery({
+        start_date: startDate,
+        end_date: endDate,
+        user_id: currentUser.id,
+      });
+
+  const { blob, filename } = await requestBlob(`/api/generation/pdf${query}`);
+  const url = window.URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.URL.revokeObjectURL(url);
+
+  return filename;
 }

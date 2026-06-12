@@ -11,6 +11,7 @@ class UserBase(BaseModel):
     google_id: Optional[str] = None
     email_verified: Optional[bool] = False
     plan_type: Optional[str] = "free"
+    age: Optional[int] = None
     weight: Optional[int] = None
     height: Optional[int] = None
     puls_is_normal: Optional[int] = None
@@ -26,6 +27,7 @@ class UserLogin(BaseModel):
 
 class UserUpdate(BaseModel):
     name: Optional[str] = None
+    age: Optional[int] = None
     weight: Optional[int] = None
     height: Optional[int] = None
     puls_is_normal: Optional[int] = None
@@ -34,6 +36,13 @@ class UserUpdate(BaseModel):
 class UserResponse(UserBase):
     id: int
     created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class UserAuthResponse(BaseModel):
+    status: str = "success"
+    token: str = Field(..., description="Сгенерированный auth_token для бота или сессии")
+    user: UserResponse  # Вкладываем сюда твою готовую схему со всеми данными юзера
 
     model_config = ConfigDict(from_attributes=True)
 
