@@ -1,0 +1,27 @@
+# Local secrets
+.env
+.env.*
+!.env.example
+diary-of-symptoms/.env
+diary-of-symptoms/.env.*
+!diary-of-symptoms/.env.example
+
+# Local virtual environments and caches
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Frontend dependencies and build output
+node_modules/
+diary-of-symptoms/frontend/node_modules/
+diary-of-symptoms/frontend/dist/
+diary-of-symptoms/frontend/.vite/
+
+# Logs and local data
+*.log
+*.db
+*.sqlite
+*.sqlite3
