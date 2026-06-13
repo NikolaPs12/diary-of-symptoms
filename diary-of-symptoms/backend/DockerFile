@@ -8,7 +8,7 @@ RUN pip install --user --no-cache-dir -r requirements.txt
 
 FROM python:3.11-slim
 
-WORKDIR /app/backend
+WORKDIR /app
 
 RUN useradd -m myuser
 
@@ -25,4 +25,4 @@ ENV PATH=/home/myuser/.local/bin:$PATH
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.services.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.app.services.main:app", "--host", "0.0.0.0", "--port", "8000"]
