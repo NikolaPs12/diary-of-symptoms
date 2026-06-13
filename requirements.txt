@@ -1,6 +1,7 @@
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.12.1
+aiogram==3.20.0
 argcomplete==3.6.3
 attrs==25.4.0
 beautifulsoup4==4.14.3
@@ -60,7 +61,7 @@ PyAudio==0.2.13
 pycairo==1.28.0
 pycparser==2.22
 pycups==2.0.4
-pydantic==2.12.5
+pydantic==2.11.7
 pydantic-settings==2.13.1
 pydantic_core==2.41.5
 pydentic==0.0.1.dev3

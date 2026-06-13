@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+import logging
 
 from app.routers.Generation import router as generation_router
 from app.routers.Medication import router as medication_router
@@ -22,6 +24,35 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
+
+# Simple request-logging middleware for debugging incoming requests and bodies.
+logger = logging.getLogger("uvicorn.error")
+
+
+class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        try:
+            body_bytes = await request.body()
+        except Exception:
+            body_bytes = b""
+
+        try:
+            body_text = body_bytes.decode("utf-8")
+        except Exception:
+            body_text = str(body_bytes)
+
+        logger.info("Incoming request: %s %s headers=%s body=%s", request.method, request.url.path, dict(request.headers), body_text[:2000])
+
+        # Recreate receive so downstream handlers can read the body again
+        async def receive() -> dict:
+            return {"type": "http.request", "body": body_bytes}
+
+        request._receive = receive
+        response = await call_next(request)
+        return response
+
+
+app.add_middleware(RequestLoggingMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

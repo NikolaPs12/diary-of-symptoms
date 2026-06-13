@@ -10,8 +10,10 @@ RUN npm ci
 
 # Если нужен другой API URL, его можно передать при сборке:
 # docker build --build-arg VITE_API_BASE_URL=https://api.example.com .
-ARG VITE_API_BASE_URL=http://127.0.0.1:8000
+ARG VITE_API_BASE_URL=
+# Build-time injected API base. Default is empty string (relative requests).
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
 
 COPY . .
 RUN npm run build

@@ -1,4 +1,17 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
+// Force all requests to the local backend. In this setup the only valid backend
+// host is localhost:8000, so we hardcode it to avoid any accidental external
+// routing when the app is exposed via a tunnel.
+const API_BASE = "http://localhost:8000";
+
+// Runtime debug: print forced API base and current hostname in browser console
+if (typeof window !== "undefined") {
+  try {
+    // eslint-disable-next-line no-console
+    console.debug("[api] FORCED API_BASE:", API_BASE, "hostname:", window.location.hostname);
+  } catch (e) {
+    // ignore
+  }
+}
 const AUTH_STORAGE_KEY = "diary.auth";
 
 let currentUser = null;
