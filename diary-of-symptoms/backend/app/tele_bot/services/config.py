@@ -7,10 +7,18 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-BASE_DIR = Path(__file__).resolve().parents[4]
-ENV_PATH = BASE_DIR / ".env"
+CURRENT_FILE = Path(__file__).resolve()
+ENV_CANDIDATES = [
+    os.getenv("ENV_FILE"),
+    CURRENT_FILE.parents[4] / ".env",
+    CURRENT_FILE.parents[3] / ".env",
+    Path.cwd() / ".env",
+]
 
-load_dotenv(dotenv_path=ENV_PATH)
+for env_path in ENV_CANDIDATES:
+    if env_path and Path(env_path).exists():
+        load_dotenv(dotenv_path=env_path)
+        break
 
 
 @dataclass(slots=True)

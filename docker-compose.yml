@@ -20,16 +20,23 @@ services:
   backend:
     build:
       context: ./diary-of-symptoms
-      dockerfile: backend/DockerFile
+      dockerfile: backend/Dockerfile
     container_name: diary_backend
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     env_file:
-      - ./diary-of-symptoms/.env
+      - path: ./.env
+        required: false
+      - path: ./diary-of-symptoms/.env
+        required: false
     environment:
+      APP_NAME: ${APP_NAME:-Diary Of Symptoms API}
+      DEBUG: ${DEBUG:-false}
       DATABASE_URL: postgresql+asyncpg://${DB_USER:-diary_user}:${DB_PASSWORD:-change-me}@db:5432/${DB_NAME:-diary_symptoms}
+      API_AI_KEY: ${API_AI_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:80","http://localhost","http://localhost:5173","http://127.0.0.1:5173"]}
       BACKEND_API_BASE_URL: http://backend:8000
     ports:
       - "8000:8000"
@@ -37,24 +44,38 @@ services:
   telegram_bot:
     build:
       context: ./diary-of-symptoms
-      dockerfile: backend/DockerFile
+      dockerfile: backend/Dockerfile
     container_name: diary_bot
     restart: unless-stopped
     depends_on:
       - backend
     env_file:
-      - ./diary-of-symptoms/.env
+      - path: ./.env
+        required: false
+      - path: ./diary-of-symptoms/.env
+        required: false
     environment:
       TOKEN: ${TOKEN:-}
       BACKEND_API_BASE_URL: http://backend:8000
+      BOT_REQUEST_TIMEOUT: ${BOT_REQUEST_TIMEOUT:-15}
+      BOT_RETRY_ATTEMPTS: ${BOT_RETRY_ATTEMPTS:-2}
+      BOT_RETRY_BACKOFF: ${BOT_RETRY_BACKOFF:-0.4}
+      BOT_PROFILE_CACHE_TTL: ${BOT_PROFILE_CACHE_TTL:-30}
     working_dir: /app/backend/app/tele_bot
-    command: python tele_bot/main.py
+    command: >
+      sh -c 'if [ -z "$${TOKEN}" ]; then
+        echo "TOKEN is not configured. Set TOKEN in .env, then restart telegram_bot.";
+        sleep infinity;
+      else
+        python main.py;
+      fi'
 
   frontend:
     build:
       context: ./diary-of-symptoms/frontend
       args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://127.0.0.1:8000}
+        # Default to empty so frontend uses relative URLs (e.g. /api/...)
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
     container_name: diary_frontend
     restart: unless-stopped
     ports:
