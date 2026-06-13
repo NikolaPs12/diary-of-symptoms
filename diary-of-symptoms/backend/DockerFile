@@ -45,7 +45,7 @@ RUN apt-get update && \
 RUN useradd --create-home --shell /usr/sbin/nologin appuser
 
 COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
-COPY --chown=appuser:appuser diary-of-symptoms/backend ./backend
+COPY --chown=appuser:appuser backend ./backend
 
 WORKDIR /app/backend
 USER appuser
