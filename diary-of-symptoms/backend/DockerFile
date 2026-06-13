@@ -49,6 +49,7 @@ COPY --chown=appuser:appuser backend ./backend
 
 WORKDIR /app/backend
 USER appuser
+RUN python -c "import weasyprint"
 
 EXPOSE 8000
 
