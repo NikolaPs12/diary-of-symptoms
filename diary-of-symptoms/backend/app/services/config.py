@@ -31,6 +31,8 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
+        "https://ids-classifieds-military-bride.trycloudflare.com",
+        "https://yours-marketplace-share-bottles.trycloudflare.com",
     ]
     api_ai_key: str = ""
     static_dir: str = "backend/static"
