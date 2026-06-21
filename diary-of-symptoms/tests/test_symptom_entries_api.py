@@ -47,6 +47,12 @@ async def test_create_get_and_list_symptom_entries(client, monkeypatch):
     assert len(entries) == 1
     assert entries[0]["id"] == created["id"]
 
+    scores_response = await client.get(f"/api/health-scores?user_id={user['id']}")
+    assert scores_response.status_code == 200
+    scores = scores_response.json()
+    assert len(scores) == 1
+    assert scores[0]["score"] == 45
+
 
 @pytest.mark.asyncio
 async def test_create_symptom_entry_validates_severity(client):

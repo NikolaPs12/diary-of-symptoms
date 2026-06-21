@@ -14,6 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app.models.User import User
 from app.models.SymptomEntry import SymptomEntry
 from app.models.Medication import Medication
+from app.models.Score import HealthScores
 from app.services.database import engine, Base
 
 config = context.config

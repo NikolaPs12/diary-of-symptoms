@@ -2,12 +2,14 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import { Brain, MoonStar, Siren, Sparkles } from "lucide-react";
+import { Brain, HeartPulse, MoonStar, Siren, Sparkles } from "lucide-react";
 import SectionHeader from "../components/SectionHeader";
 
 function MetricBar({ label, value, suffix = "/10" }) {
@@ -44,12 +46,17 @@ function InsightQuote({ text, title }) {
   );
 }
 
-export default function DashboardPage({ latestEntry, profileCard, entries, currentUser, copy }) {
+export default function DashboardPage({ latestEntry, profileCard, entries, currentUser, healthScores, copy }) {
   const chartData = entries.slice(0, 6).reverse().map((entry) => ({
     name: entry.symptom,
     severity: entry.severity,
     stress: entry.stress_level,
   }));
+  const healthScoreData = (healthScores ?? []).map((score) => ({
+    ...score,
+    date: new Date(score.calculated_at).toLocaleDateString(),
+  }));
+  const latestHealthScore = healthScoreData[healthScoreData.length - 1];
 
   return (
     <div className="space-y-6">
@@ -65,6 +72,70 @@ export default function DashboardPage({ latestEntry, profileCard, entries, curre
             <MetricBar label={copy.dashboard.severity} value={latestEntry?.severity ?? 0} />
             <MetricBar label={copy.dashboard.sleepQuality} value={latestEntry?.sleep_quality ?? 0} />
             <MetricBar label={copy.dashboard.stressLevel} value={latestEntry?.stress_level ?? 0} />
+          </div>
+
+          <div className="surface p-5 md:p-6">
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-diary-muted">
+                  <HeartPulse className="h-4 w-4 text-diary-black" />
+                  {copy.dashboard.currentHealthScore}
+                </div>
+                <h3 className="mt-2 text-xl font-semibold tracking-swiss">
+                  {copy.dashboard.healthTrend}
+                </h3>
+              </div>
+              <div className="text-right">
+                <div className="metric-digits text-5xl">
+                  {latestHealthScore?.score ?? "--"}
+                  <span className="text-lg text-diary-muted">/100</span>
+                </div>
+                <div className="mt-1 text-xs uppercase tracking-[0.2em] text-diary-muted">
+                  {latestHealthScore?.date ?? copy.dashboard.scoreEmpty}
+                </div>
+              </div>
+            </div>
+
+            {healthScoreData.length > 0 ? (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={healthScoreData}>
+                    <CartesianGrid stroke="#E5E5E5" vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: "#737373", fontSize: 12 }}
+                    />
+                    <YAxis
+                      domain={[0, 100]}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: "#737373", fontSize: 12 }}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "#F5F5F5" }}
+                      contentStyle={{
+                        borderRadius: 0,
+                        border: "1px solid #000000",
+                        backgroundColor: "#FFFFFF",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="score"
+                      stroke="#4F46E5"
+                      strokeWidth={2}
+                      dot={{ fill: "#000000", r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="surface-muted p-5 text-sm leading-6 text-diary-muted">
+                {copy.dashboard.scoreEmpty}
+              </div>
+            )}
           </div>
 
           <div className="surface p-5 md:p-6">

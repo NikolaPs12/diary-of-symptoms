@@ -22,6 +22,7 @@ export default function Layout({
   const navItems = [
     { id: "/dashboard", label: copy.nav.dashboard, icon: Activity },
     { id: "/entry", label: copy.nav.entry, icon: PlusSquare },
+    { id: "/health-state", label: copy.nav.healthState, icon: Activity },
     { id: "/pdf", label: copy.nav.pdf, icon: FileText },
     { id: "/profile", label: copy.nav.profile, icon: UserRound },
   ];

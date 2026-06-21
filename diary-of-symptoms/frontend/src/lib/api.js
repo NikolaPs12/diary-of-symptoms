@@ -198,15 +198,17 @@ export async function getAppSnapshot() {
       currentUser: null,
       entries: [],
       latestEntry: null,
+      healthScores: [],
       medications: [],
       profileCard: null,
     };
   }
 
-  const [freshUser, entriesResponse, medicationsResponse] = await Promise.all([
+  const [freshUser, entriesResponse, medicationsResponse, healthScores] = await Promise.all([
     request(`/api/users/${currentUser.id}`),
     request(`/api/symptom-entries?user_id=${currentUser.id}`),
     request(`/api/medications?user_id=${currentUser.id}`),
+    getHealthScores(),
   ]);
 
   saveAuthSession({ user: freshUser, token: authToken });
@@ -222,9 +224,21 @@ export async function getAppSnapshot() {
     currentUser: freshUser,
     entries,
     latestEntry: entries[0] ?? null,
+    healthScores,
     medications,
     profileCard: medications[0] ?? null,
   };
+}
+
+export async function getHealthScores() {
+  if (!currentUser?.id) return [];
+  const scores = await request(`/api/health-scores?user_id=${currentUser.id}`);
+  return (scores || []).map((score) => ({
+    id: score.id,
+    user_id: score.user_id,
+    score: Number(score.score),
+    calculated_at: score.calculated_at ?? score.сalculated_at,
+  }));
 }
 
 export async function loginUser({ email, password }) {

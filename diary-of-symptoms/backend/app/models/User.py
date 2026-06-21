@@ -5,8 +5,10 @@ from sqlalchemy.sql import func
 from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
+    from .Score import HealthScores
     from .Medication import Medication
     from .SymptomEntry import SymptomEntry
+    from .Reminders import Reminders
 
 from app.services.database import Base
 
@@ -31,3 +33,5 @@ class User(Base):
     
     medications: Mapped[List["Medication"]] = relationship("Medication", back_populates="user")
     symptom_entries: Mapped[List["SymptomEntry"]] = relationship("SymptomEntry", back_populates="user")
+    health_scores: Mapped[List["HealthScores"]] = relationship("HealthScores", back_populates="user")
+    reminders: Mapped[List["Reminders"]] = relationship("Reminders")

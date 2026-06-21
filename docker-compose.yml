@@ -36,10 +36,12 @@ services:
       DEBUG: ${DEBUG:-false}
       DATABASE_URL: postgresql+asyncpg://${DB_USER:-diary_user}:${DB_PASSWORD:-change-me}@db:5432/${DB_NAME:-diary_symptoms}
       API_AI_KEY: ${API_AI_KEY:-}
-      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:80","http://localhost","http://localhost:5173","http://127.0.0.1:5173"]}
+      # Allow localhost dev and the Cloudflare Tunnel frontend origin
+      CORS_ORIGINS: ${CORS_ORIGINS:-["https://ids-classifieds-military-bride.trycloudflare.com","http://localhost:80","http://localhost","http://localhost:5173","http://127.0.0.1:5173"]}
       BACKEND_API_BASE_URL: http://backend:8000
     ports:
       - "8000:8000"
+
 
   telegram_bot:
     build:

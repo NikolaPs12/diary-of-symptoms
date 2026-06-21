@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout";
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
+import HealthStatePage from "./pages/HealthStatePage";
 import PdfExportPage from "./pages/PdfExportPage";
 import ProfilePage from "./pages/ProfilePage";
 import SymptomEntryPage from "./pages/SymptomEntryPage";
@@ -70,6 +71,7 @@ export default function App() {
     currentUser: null,
     entries: [],
     latestEntry: null,
+    healthScores: [],
     medications: [],
     profileCard: null,
   });
@@ -130,6 +132,17 @@ export default function App() {
       case "/entry":
         return (
           <SymptomEntryPage
+            copy={copy}
+            onSubmitEntry={async (form) => {
+              const nextEntry = await createSymptomEntry(form);
+              await refreshSnapshot();
+              return nextEntry;
+            }}
+          />
+        );
+      case "/health-state":
+        return (
+          <HealthStatePage
             copy={copy}
             onSubmitEntry={async (form) => {
               const nextEntry = await createSymptomEntry(form);
@@ -214,6 +227,7 @@ export default function App() {
             profileCard={snapshot.profileCard}
             entries={snapshot.entries}
             currentUser={snapshot.currentUser}
+            healthScores={snapshot.healthScores}
             copy={copy}
           />
         );
@@ -254,6 +268,7 @@ export default function App() {
       currentUser: null,
       entries: [],
       latestEntry: null,
+      healthScores: [],
       medications: [],
       profileCard: null,
     });

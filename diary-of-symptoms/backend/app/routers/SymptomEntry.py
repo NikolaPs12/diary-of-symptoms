@@ -1,6 +1,6 @@
 import os
 import sqlalchemy
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -11,6 +11,7 @@ from app.models.SymptomEntry import SymptomEntry
 from app.schema.SymptomEntry import SymptomEntryCreate, SymptomEntryResponse
 from app.services.function import build_ai_insight
 from app.services.database import get_db
+from app.services.scoring import update_daily_health_score
 from dotenv import load_dotenv
 
 
@@ -22,21 +23,49 @@ router = APIRouter(
 
 load_dotenv()
 
-@router.post("/add", status_code=status.HTTP_201_CREATED)
-async def create_symptom_entry(symptom_entry: SymptomEntryCreate, db: AsyncSession = Depends(get_db)):
+
+def to_naive_utc(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        return value
+    return value.astimezone(timezone.utc).replace(tzinfo=None)
+
+@router.post("/add", status_code=status.HTTP_201_CREATED, response_model=SymptomEntryResponse)
+async def create_symptom_entry(
+    symptom_entry: SymptomEntryCreate,
+    db: AsyncSession = Depends(get_db)
+):
     # Вызываем ИИ-анализ
     ai_insights = build_ai_insight(symptom_entry)
     
     entry_data = symptom_entry.model_dump()
     entry_data["ai_insights"] = ai_insights
     
+    # Достаем user_id, который пришел от фронтенда в JSON
+    user_id = entry_data.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id is required in body")
+    
+    current_utc_time = datetime.now(timezone.utc)
+    current_db_time = to_naive_utc(current_utc_time)
+    
     if entry_data.get("start_at") is None:
-        entry_data["start_at"] = datetime.utcnow()
+        entry_data["start_at"] = current_db_time
+    else:
+        entry_data["start_at"] = to_naive_utc(entry_data["start_at"])
 
     db_entry = SymptomEntry(**entry_data)
     db.add(db_entry)
+    
+    # Сначала сохраняем запись в БД
     await db.commit()
     await db.refresh(db_entry)
+    
+    await update_daily_health_score(
+        db=db,
+        user_id=user_id,
+        event_timestamp=db_entry.start_at,
+    )
+    
     return db_entry
 
 @router.get("/{entry_id}", response_model=SymptomEntryResponse)
