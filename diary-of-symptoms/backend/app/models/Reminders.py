@@ -1,7 +1,6 @@
 from datetime import datetime
-from sqlalchemy import ForeignKey, Integer, CheckConstraint, UniqueConstraint, String, Text, Boolean, DateTime
+from sqlalchemy import ForeignKey, String, Text, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -15,11 +14,12 @@ class Reminders(Base):
     type: Mapped[str] = mapped_column(String)
     title: Mapped[str] = mapped_column(String)
     message: Mapped[str] = mapped_column(Text)
-    corn_expr: Mapped[str] = mapped_column(String)
+    cron_expr: Mapped[str] = mapped_column(String)
     send_telegram: Mapped[bool] = mapped_column(Boolean, default=False)
+    telegram_chat_id: Mapped[int | None] = mapped_column(nullable=True, default=None)
     send_email: Mapped[bool] = mapped_column(Boolean, default=False)
-    enable: Mapped[bool] = mapped_column(Boolean, default=False)
-    last_send_at: Mapped[datetime] = mapped_column(DateTime)
+    enable: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_send_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, default=None)
     next_send_at: Mapped[datetime] = mapped_column(DateTime)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
-    user: Mapped["User"] = relationship("User", back_populates="health_scores")
+    user: Mapped["User"] = relationship("User", back_populates="reminders")

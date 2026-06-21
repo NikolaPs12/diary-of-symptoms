@@ -45,3 +45,7 @@ async def init_db():
         # so we add the age column explicitly for older deployments.
         if database_url.startswith("postgresql"):
             await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS age INTEGER"))
+            await conn.execute(text("ALTER TABLE reminders ADD COLUMN IF NOT EXISTS cron_expr VARCHAR"))
+            await conn.execute(text("ALTER TABLE reminders ADD COLUMN IF NOT EXISTS telegram_chat_id BIGINT"))
+            await conn.execute(text("ALTER TABLE reminders ALTER COLUMN last_send_at DROP NOT NULL"))
+            await conn.execute(text("ALTER TABLE reminders ALTER COLUMN enable SET DEFAULT true"))

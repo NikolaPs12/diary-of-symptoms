@@ -10,11 +10,11 @@ import logging
 
 from app.routers.Generation import router as generation_router
 from app.routers.Medication import router as medication_router
+from app.routers.Reminders import router as reminders_router
 from app.routers.Score import router as score_router
 from app.routers.SymptomEntry import router as symptom_entry_router
 from app.routers.User import router as user_router
 from app.services.config import settings
-from app.services.database import init_db
 from app.services.database import init_db, SessionLocal  # Импортируем SessionLocal
 from app.services.reminders import reminder_loop
 
@@ -35,6 +35,10 @@ async def lifespan(app: FastAPI):
     print("=== Остановка фонового воркера ===")
     # 3. Когда сервер тушится, аккуратно закрываем воркер
     worker_task.cancel()
+    try:
+        await worker_task
+    except asyncio.CancelledError:
+        pass
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
@@ -81,6 +85,7 @@ app.include_router(symptom_entry_router)
 app.include_router(medication_router)
 app.include_router(generation_router)
 app.include_router(score_router)
+app.include_router(reminders_router)
 
 
 if __name__ == "__main__":

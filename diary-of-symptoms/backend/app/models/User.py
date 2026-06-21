@@ -34,4 +34,4 @@ class User(Base):
     medications: Mapped[List["Medication"]] = relationship("Medication", back_populates="user")
     symptom_entries: Mapped[List["SymptomEntry"]] = relationship("SymptomEntry", back_populates="user")
     health_scores: Mapped[List["HealthScores"]] = relationship("HealthScores", back_populates="user")
-    reminders: Mapped[List["Reminders"]] = relationship("Reminders")
+    reminders: Mapped[List["Reminders"]] = relationship("Reminders", back_populates="user")
