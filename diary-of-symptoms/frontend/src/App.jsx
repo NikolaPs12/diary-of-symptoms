@@ -3,19 +3,26 @@ import Layout from "./components/Layout";
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
 import HealthStatePage from "./pages/HealthStatePage";
+import NotificationsPage from "./pages/NotificationsPage";
 import PdfExportPage from "./pages/PdfExportPage";
 import ProfilePage from "./pages/ProfilePage";
 import SymptomEntryPage from "./pages/SymptomEntryPage";
 import {
+  createReminder,
   createSymptomEntry,
+  deleteReminder,
   exportPdfReport,
   getAppSnapshot,
+  getReminders,
   loginUser,
   logoutUser,
   registerUser,
   saveProfileCard,
+  toggleReminder,
+  updateReminder,
 } from "./lib/api";
 import { getTranslation } from "./lib/translations";
+import { applyTheme, getStoredTheme } from "./lib/themes";
 
 const DEFAULT_ROUTE = "/dashboard";
 const AUTH_ROUTES = ["/login", "/register"];
@@ -76,16 +83,22 @@ export default function App() {
     profileCard: null,
   });
   const [locale, setLocale] = useState(getInitialLocale);
+  const [theme, setTheme] = useState(getStoredTheme);
   const [authForms, setAuthForms] = useState(() => loadForms(getInitialLocale()));
   const [authError, setAuthError] = useState("");
   const [pdfRange, setPdfRange] = useState({ startDate: "", endDate: "" });
   const [pdfStatus, setPdfStatus] = useState("");
   const [isBootstrapping, setIsBootstrapping] = useState(true);
+  const [reminders, setReminders] = useState([]);
 
   const copy = getTranslation(locale);
 
   const refreshSnapshot = async () => {
     setSnapshot(await getAppSnapshot());
+  };
+
+  const refreshReminders = async () => {
+    setReminders(await getReminders());
   };
 
   const handlePdfExport = async (exporter) => {
@@ -106,7 +119,7 @@ export default function App() {
       navigateTo(snapshot.currentUser ? DEFAULT_ROUTE : "/login");
     }
 
-    refreshSnapshot().finally(() => setIsBootstrapping(false));
+    Promise.all([refreshSnapshot(), refreshReminders()]).finally(() => setIsBootstrapping(false));
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
@@ -157,9 +170,37 @@ export default function App() {
             currentUser={snapshot.currentUser}
             profileCard={snapshot.profileCard}
             copy={copy}
+            theme={theme}
+            onThemeChange={(nextTheme) => {
+              const appliedTheme = applyTheme(nextTheme);
+              setTheme(appliedTheme);
+            }}
             onSaveProfileCard={async (form) => {
               await saveProfileCard(form);
               await refreshSnapshot();
+            }}
+          />
+        );
+      case "/notifications":
+        return (
+          <NotificationsPage
+            copy={copy}
+            reminders={reminders}
+            onCreateReminder={async (payload) => {
+              await createReminder(payload);
+              await refreshReminders();
+            }}
+            onUpdateReminder={async (reminderId, payload) => {
+              await updateReminder(reminderId, payload);
+              await refreshReminders();
+            }}
+            onDeleteReminder={async (reminderId) => {
+              await deleteReminder(reminderId);
+              await refreshReminders();
+            }}
+            onToggleReminder={async (reminderId, enable) => {
+              await toggleReminder(reminderId, enable);
+              await refreshReminders();
             }}
           />
         );
@@ -255,7 +296,7 @@ export default function App() {
       } else {
         await loginUser(currentAuthForm);
       }
-      await refreshSnapshot();
+      await Promise.all([refreshSnapshot(), refreshReminders()]);
       navigateTo(DEFAULT_ROUTE);
     } catch (error) {
       setAuthError(error.message || "Unable to continue");
@@ -272,6 +313,7 @@ export default function App() {
       medications: [],
       profileCard: null,
     });
+    setReminders([]);
     navigateTo("/login");
   };
 

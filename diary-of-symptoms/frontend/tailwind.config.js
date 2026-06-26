@@ -5,12 +5,14 @@ export default {
     extend: {
       colors: {
         diary: {
-          white: "#FFFFFF",
-          panel: "#F5F5F5",
-          line: "#E5E5E5",
-          muted: "#737373",
-          black: "#000000",
-          accent: "#4F46E5",
+          white: "var(--surface)",
+          panel: "var(--bg-secondary)",
+          line: "var(--border)",
+          muted: "var(--text-muted)",
+          black: "var(--text)",
+          accent: "var(--accent)",
+          accentSoft: "var(--accent-soft)",
+          bg: "var(--bg)",
         },
       },
       fontFamily: {

@@ -9,8 +9,38 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useEffect, useState } from "react";
 import { Brain, HeartPulse, MoonStar, Siren, Sparkles } from "lucide-react";
 import SectionHeader from "../components/SectionHeader";
+
+function readChartTheme() {
+  if (typeof window === "undefined") {
+    return {
+      primary: "#4f46e5",
+      secondary: "#d4d4d4",
+      grid: "#e5e5e5",
+      text: "#737373",
+      tooltipBg: "#ffffff",
+      tooltipBorder: "#111111",
+      accentSoft: "#f5f5f5",
+      surface: "#ffffff",
+      textPrimary: "#111111",
+    };
+  }
+
+  const styles = getComputedStyle(document.documentElement);
+  return {
+    primary: styles.getPropertyValue("--chart-primary").trim(),
+    secondary: styles.getPropertyValue("--chart-secondary").trim(),
+    grid: styles.getPropertyValue("--chart-grid").trim(),
+    text: styles.getPropertyValue("--chart-text").trim(),
+    tooltipBg: styles.getPropertyValue("--chart-tooltip-bg").trim(),
+    tooltipBorder: styles.getPropertyValue("--chart-tooltip-border").trim(),
+    accentSoft: styles.getPropertyValue("--accent-soft").trim(),
+    surface: styles.getPropertyValue("--surface").trim(),
+    textPrimary: styles.getPropertyValue("--text").trim(),
+  };
+}
 
 function MetricBar({ label, value, suffix = "/10" }) {
   return (
@@ -22,8 +52,11 @@ function MetricBar({ label, value, suffix = "/10" }) {
           <span className="text-lg text-diary-muted">{suffix}</span>
         </div>
       </div>
-      <div className="mt-5 h-2 w-full bg-diary-line">
-        <div className="h-full bg-diary-black" style={{ width: `${Math.min(value * 10, 100)}%` }} />
+      <div className="mt-5 h-2 w-full rounded-full bg-[var(--metric-track)]">
+        <div
+          className="h-full rounded-full bg-[var(--metric-fill)]"
+          style={{ width: `${Math.min(value * 10, 100)}%` }}
+        />
       </div>
     </div>
   );
@@ -47,6 +80,22 @@ function InsightQuote({ text, title }) {
 }
 
 export default function DashboardPage({ latestEntry, profileCard, entries, currentUser, healthScores, copy }) {
+  const [chartTheme, setChartTheme] = useState(readChartTheme);
+
+  useEffect(() => {
+    const updateTheme = () => setChartTheme(readChartTheme());
+    updateTheme();
+    window.addEventListener("storage", updateTheme);
+
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+    return () => {
+      window.removeEventListener("storage", updateTheme);
+      observer.disconnect();
+    };
+  }, []);
+
   const chartData = entries.slice(0, 6).reverse().map((entry) => ({
     name: entry.symptom,
     severity: entry.severity,
@@ -100,33 +149,34 @@ export default function DashboardPage({ latestEntry, profileCard, entries, curre
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={healthScoreData}>
-                    <CartesianGrid stroke="#E5E5E5" vertical={false} />
+                    <CartesianGrid stroke={chartTheme.grid} vertical={false} />
                     <XAxis
                       dataKey="date"
                       tickLine={false}
                       axisLine={false}
-                      tick={{ fill: "#737373", fontSize: 12 }}
+                      tick={{ fill: chartTheme.text, fontSize: 12 }}
                     />
                     <YAxis
                       domain={[0, 100]}
                       tickLine={false}
                       axisLine={false}
-                      tick={{ fill: "#737373", fontSize: 12 }}
+                      tick={{ fill: chartTheme.text, fontSize: 12 }}
                     />
                     <Tooltip
-                      cursor={{ fill: "#F5F5F5" }}
+                      cursor={{ fill: chartTheme.accentSoft }}
                       contentStyle={{
-                        borderRadius: 0,
-                        border: "1px solid #000000",
-                        backgroundColor: "#FFFFFF",
+                        borderRadius: 12,
+                        border: `1px solid ${chartTheme.tooltipBorder}`,
+                        backgroundColor: chartTheme.tooltipBg,
+                        color: chartTheme.textPrimary,
                       }}
                     />
                     <Line
                       type="monotone"
                       dataKey="score"
-                      stroke="#4F46E5"
+                      stroke={chartTheme.primary}
                       strokeWidth={2}
-                      dot={{ fill: "#000000", r: 4 }}
+                      dot={{ fill: chartTheme.textPrimary, r: 4 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -150,11 +200,11 @@ export default function DashboardPage({ latestEntry, profileCard, entries, curre
               </div>
               <div className="flex gap-3 text-xs uppercase tracking-[0.2em] text-diary-muted">
                 <span className="inline-flex items-center gap-2">
-                  <span className="h-2 w-2 bg-diary-black" />
+                  <span className="h-2 w-2 rounded-full bg-[var(--chart-primary)]" />
                   {copy.dashboard.severity}
                 </span>
                 <span className="inline-flex items-center gap-2">
-                  <span className="h-2 w-2 border border-diary-black bg-diary-panel" />
+                  <span className="h-2 w-2 rounded-full border border-diary-line bg-[var(--chart-secondary)]" />
                   {copy.dashboard.stressLevel}
                 </span>
               </div>
@@ -162,29 +212,30 @@ export default function DashboardPage({ latestEntry, profileCard, entries, curre
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} barGap={10}>
-                  <CartesianGrid stroke="#E5E5E5" vertical={false} />
+                  <CartesianGrid stroke={chartTheme.grid} vertical={false} />
                   <XAxis
                     dataKey="name"
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fill: "#737373", fontSize: 12 }}
+                    tick={{ fill: chartTheme.text, fontSize: 12 }}
                   />
                   <YAxis
                     domain={[0, 10]}
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fill: "#737373", fontSize: 12 }}
+                    tick={{ fill: chartTheme.text, fontSize: 12 }}
                   />
                   <Tooltip
-                    cursor={{ fill: "#F5F5F5" }}
+                    cursor={{ fill: chartTheme.accentSoft }}
                     contentStyle={{
-                      borderRadius: 0,
-                      border: "1px solid #000000",
-                      backgroundColor: "#FFFFFF",
+                      borderRadius: 12,
+                      border: `1px solid ${chartTheme.tooltipBorder}`,
+                      backgroundColor: chartTheme.tooltipBg,
+                      color: chartTheme.textPrimary,
                     }}
                   />
-                  <Bar dataKey="severity" fill="#000000" radius={0} />
-                  <Bar dataKey="stress" fill="#D4D4D4" stroke="#000000" radius={0} />
+                  <Bar dataKey="severity" fill={chartTheme.primary} radius={8} />
+                  <Bar dataKey="stress" fill={chartTheme.secondary} stroke={chartTheme.textPrimary} radius={8} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

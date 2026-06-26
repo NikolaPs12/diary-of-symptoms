@@ -8,7 +8,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from api_client.client import api_client
-from handlers import auth_router, menu_router, profile_router, report_router, symptoms_router
+from handlers import auth_router, menu_router, notifications_router, profile_router, report_router, symptoms_router
 from services.config import settings
 from services.session_store import init_db
 
@@ -36,6 +36,7 @@ async def main() -> None:
     dp.include_router(menu_router)
     dp.include_router(auth_router)
     dp.include_router(profile_router)
+    dp.include_router(notifications_router)
     dp.include_router(report_router)
     dp.include_router(symptoms_router)
 

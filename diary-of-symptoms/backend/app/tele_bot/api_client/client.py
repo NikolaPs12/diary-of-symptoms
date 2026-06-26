@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
 
+WEEKDAY_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+
 import httpx
 
 from services.config import settings
@@ -180,6 +182,65 @@ class TelegramBackendClient:
         if not isinstance(result.data, dict):
             raise BackendAPIError("Invalid symptom entry payload")
         return result.data
+
+    async def list_reminders(self, user_id: int, token: str | None = None) -> list[dict[str, Any]]:
+        result = await self._request("GET", "/api/reminders", token=token, params={"user_id": user_id})
+        if not isinstance(result.data, list):
+            raise BackendAPIError("Invalid reminders list payload")
+        return result.data
+
+    async def create_reminder(self, payload: dict[str, Any], token: str | None = None) -> dict[str, Any]:
+        result = await self._request("POST", "/api/reminders", token=token, json_body=payload)
+        if not isinstance(result.data, dict):
+            raise BackendAPIError("Invalid reminder payload")
+        return result.data
+
+    async def update_reminder(
+        self,
+        reminder_id: int,
+        payload: dict[str, Any],
+        *,
+        user_id: int,
+        token: str | None = None,
+    ) -> dict[str, Any]:
+        result = await self._request(
+            "PUT",
+            f"/api/reminders/{reminder_id}",
+            token=token,
+            params={"user_id": user_id},
+            json_body=payload,
+        )
+        if not isinstance(result.data, dict):
+            raise BackendAPIError("Invalid reminder payload")
+        return result.data
+
+    async def toggle_reminder(
+        self,
+        reminder_id: int,
+        enable: bool,
+        *,
+        user_id: int,
+        token: str | None = None,
+    ) -> dict[str, Any]:
+        result = await self._request(
+            "PATCH",
+            f"/api/reminders/{reminder_id}/toggle",
+            token=token,
+            params={"user_id": user_id},
+            json_body={"enable": enable},
+        )
+        if not isinstance(result.data, dict):
+            raise BackendAPIError("Invalid reminder payload")
+        return result.data
+
+    async def delete_reminder(self, reminder_id: int, *, user_id: int, token: str | None = None) -> None:
+        await self._request(
+            "DELETE",
+            f"/api/reminders/{reminder_id}",
+            token=token,
+            params={"user_id": user_id},
+            expect_json=False,
+        )
 
     async def download_pdf_report(
         self,

@@ -6,50 +6,276 @@
 
 @layer base {
   :root {
-    color: #000000;
-    background: #ffffff;
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --surface: #ffffff;
+    --surface-hover: #fafafa;
+    --surface-elevated: #ffffff;
+    --text: #111111;
+    --text-muted: #6b7280;
+    --border: #e5e5e5;
+    --border-strong: #111111;
+    --accent: #4f46e5;
+    --accent-soft: rgba(79, 70, 229, 0.12);
+    --success: #15803d;
+    --warning: #b45309;
+    --danger: #b91c1c;
+    --shadow: 0 18px 36px rgba(17, 24, 39, 0.06);
+    --radius: 0px;
+    --transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    --grid-line: rgba(229, 229, 229, 0.42);
+    --selection-bg: #111111;
+    --selection-text: #ffffff;
+    --nav-active-bg: #111111;
+    --nav-active-text: #ffffff;
+    --input-bg: #ffffff;
+    --metric-fill: #111111;
+    --metric-track: #e5e5e5;
+    --chart-primary: #4f46e5;
+    --chart-secondary: #d4d4d4;
+    --chart-grid: #e5e5e5;
+    --chart-text: #6b7280;
+    --chart-tooltip-bg: #ffffff;
+    --chart-tooltip-border: #111111;
+    --card-blur: 0px;
+    --card-border-style: solid;
+    color: var(--text);
+    background: var(--bg);
     font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  html[data-theme="classic"] {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --surface: #ffffff;
+    --surface-hover: #fafafa;
+    --surface-elevated: #ffffff;
+    --text: #111111;
+    --text-muted: #737373;
+    --border: #e5e5e5;
+    --border-strong: #111111;
+    --accent: #4f46e5;
+    --accent-soft: rgba(79, 70, 229, 0.12);
+    --success: #15803d;
+    --warning: #b45309;
+    --danger: #b91c1c;
+    --shadow: 0 18px 36px rgba(17, 24, 39, 0.06);
+    --radius: 0px;
+    --grid-line: rgba(229, 229, 229, 0.35);
+    --selection-bg: #111111;
+    --selection-text: #ffffff;
+    --nav-active-bg: #111111;
+    --nav-active-text: #ffffff;
+    --input-bg: #ffffff;
+    --metric-fill: #111111;
+    --metric-track: #e5e5e5;
+    --chart-primary: #4f46e5;
+    --chart-secondary: #d4d4d4;
+    --chart-grid: #e5e5e5;
+    --chart-text: #737373;
+    --chart-tooltip-bg: #ffffff;
+    --chart-tooltip-border: #111111;
+    --card-blur: 0px;
+    --card-border-style: solid;
+  }
+
+  html[data-theme="midnight"] {
+    --bg: #0d1320;
+    --bg-secondary: #131c2d;
+    --surface: rgba(19, 28, 45, 0.94);
+    --surface-hover: rgba(27, 39, 63, 0.98);
+    --surface-elevated: rgba(23, 32, 51, 0.98);
+    --text: #e8eef9;
+    --text-muted: #94a3b8;
+    --border: rgba(148, 163, 184, 0.2);
+    --border-strong: rgba(125, 211, 252, 0.45);
+    --accent: #7dd3fc;
+    --accent-soft: rgba(125, 211, 252, 0.14);
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --shadow: 0 24px 48px rgba(2, 8, 23, 0.44);
+    --radius: 14px;
+    --grid-line: rgba(148, 163, 184, 0.08);
+    --selection-bg: #7dd3fc;
+    --selection-text: #0b1120;
+    --nav-active-bg: rgba(125, 211, 252, 0.14);
+    --nav-active-text: #e8eef9;
+    --input-bg: rgba(17, 24, 39, 0.72);
+    --metric-fill: #7dd3fc;
+    --metric-track: rgba(148, 163, 184, 0.18);
+    --chart-primary: #7dd3fc;
+    --chart-secondary: #60a5fa;
+    --chart-grid: rgba(148, 163, 184, 0.14);
+    --chart-text: #94a3b8;
+    --chart-tooltip-bg: #111827;
+    --chart-tooltip-border: rgba(125, 211, 252, 0.35);
+    --card-blur: 0px;
+    --card-border-style: solid;
+  }
+
+  html[data-theme="medical"] {
+    --bg: #eef6fb;
+    --bg-secondary: #ddeaf5;
+    --surface: #f8fbfd;
+    --surface-hover: #f2f8fc;
+    --surface-elevated: #ffffff;
+    --text: #13324a;
+    --text-muted: #5d768b;
+    --border: #bfd5e6;
+    --border-strong: #2563eb;
+    --accent: #2563eb;
+    --accent-soft: rgba(37, 99, 235, 0.12);
+    --success: #15803d;
+    --warning: #c2410c;
+    --danger: #dc2626;
+    --shadow: 0 20px 40px rgba(37, 99, 235, 0.08);
+    --radius: 10px;
+    --grid-line: rgba(191, 213, 230, 0.5);
+    --selection-bg: #2563eb;
+    --selection-text: #ffffff;
+    --nav-active-bg: #2563eb;
+    --nav-active-text: #ffffff;
+    --input-bg: #ffffff;
+    --metric-fill: #2563eb;
+    --metric-track: #d9e7f2;
+    --chart-primary: #2563eb;
+    --chart-secondary: #8ab6ff;
+    --chart-grid: #cfe0ee;
+    --chart-text: #5d768b;
+    --chart-tooltip-bg: #ffffff;
+    --chart-tooltip-border: #2563eb;
+    --card-blur: 0px;
+    --card-border-style: solid;
+  }
+
+  html[data-theme="focus"] {
+    --bg: #fbf7ef;
+    --bg-secondary: #f4ede1;
+    --surface: #fffdf8;
+    --surface-hover: #faf4e9;
+    --surface-elevated: #fffaf2;
+    --text: #2f2418;
+    --text-muted: #7a6956;
+    --border: #ddd0bf;
+    --border-strong: #7c5c35;
+    --accent: #7c5c35;
+    --accent-soft: rgba(124, 92, 53, 0.12);
+    --success: #5f7c3a;
+    --warning: #b7791f;
+    --danger: #c05621;
+    --shadow: 0 12px 28px rgba(79, 57, 34, 0.06);
+    --radius: 12px;
+    --grid-line: rgba(221, 208, 191, 0.38);
+    --selection-bg: #7c5c35;
+    --selection-text: #fffdf8;
+    --nav-active-bg: #7c5c35;
+    --nav-active-text: #fffdf8;
+    --input-bg: #fffdf8;
+    --metric-fill: #7c5c35;
+    --metric-track: #e9dfd2;
+    --chart-primary: #7c5c35;
+    --chart-secondary: #c8ab87;
+    --chart-grid: #e0d5c6;
+    --chart-text: #7a6956;
+    --chart-tooltip-bg: #fffdf8;
+    --chart-tooltip-border: #c7b49f;
+    --card-blur: 0px;
+    --card-border-style: solid;
+  }
+
+  html[data-theme="glass"] {
+    --bg: #edf5ff;
+    --bg-secondary: #dce8ff;
+    --surface: rgba(255, 255, 255, 0.52);
+    --surface-hover: rgba(255, 255, 255, 0.68);
+    --surface-elevated: rgba(255, 255, 255, 0.72);
+    --text: #0f172a;
+    --text-muted: #5b6b84;
+    --border: rgba(255, 255, 255, 0.64);
+    --border-strong: rgba(37, 99, 235, 0.34);
+    --accent: #2563eb;
+    --accent-soft: rgba(37, 99, 235, 0.12);
+    --success: #16a34a;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --shadow: 0 18px 36px rgba(37, 99, 235, 0.12);
+    --radius: 18px;
+    --grid-line: rgba(255, 255, 255, 0.24);
+    --selection-bg: #2563eb;
+    --selection-text: #ffffff;
+    --nav-active-bg: rgba(255, 255, 255, 0.74);
+    --nav-active-text: #0f172a;
+    --input-bg: rgba(255, 255, 255, 0.55);
+    --metric-fill: #2563eb;
+    --metric-track: rgba(148, 163, 184, 0.18);
+    --chart-primary: #2563eb;
+    --chart-secondary: #7dd3fc;
+    --chart-grid: rgba(148, 163, 184, 0.16);
+    --chart-text: #5b6b84;
+    --chart-tooltip-bg: rgba(255, 255, 255, 0.9);
+    --chart-tooltip-border: rgba(37, 99, 235, 0.28);
+    --card-blur: 18px;
+    --card-border-style: solid;
+  }
+
   * {
-    @apply border-diary-line;
+    border-color: var(--border);
+    transition: var(--transition);
   }
 
   html {
-    @apply bg-diary-white;
+    background: var(--bg);
   }
 
   body {
-    @apply min-h-screen bg-diary-white text-diary-black;
-    background-image:
-      linear-gradient(to right, rgba(229, 229, 229, 0.35) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(229, 229, 229, 0.35) 1px, transparent 1px);
-    background-size: 88px 88px;
+    @apply min-h-screen;
+    color: var(--text);
+    background:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-secondary) 100%);
+    background-size: 88px 88px, 88px 88px, 100% 100%;
   }
 
   button,
   input,
-  textarea {
+  textarea,
+  select {
     @apply outline-none;
   }
 
   ::selection {
-    background: #000000;
-    color: #ffffff;
+    background: var(--selection-bg);
+    color: var(--selection-text);
   }
 }
 
-
 @layer components {
   .surface {
-    @apply border border-diary-line bg-diary-white;
+    background: var(--surface);
+    border: 1px var(--card-border-style) var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(var(--card-blur));
   }
 
   .surface-muted {
-    @apply border border-diary-line bg-diary-panel;
+    background: var(--bg-secondary);
+    border: 1px var(--card-border-style) var(--border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(calc(var(--card-blur) * 0.7));
+  }
+
+  .surface-elevated {
+    background: var(--surface-elevated);
+    border: 1px var(--card-border-style) var(--border);
+    border-radius: calc(var(--radius) + 2px);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(var(--card-blur));
   }
 
   .metric-digits {
@@ -57,19 +283,60 @@
   }
 
   .nav-link {
-    @apply flex items-center gap-2 border border-transparent px-3 py-2 text-sm text-diary-muted transition hover:border-diary-line hover:text-diary-black;
+    @apply flex items-center gap-2 px-3 py-2 text-sm;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    border-radius: calc(var(--radius) * 0.7 + 6px);
+  }
+
+  .nav-link:hover {
+    border-color: var(--border);
+    color: var(--text);
+    background: var(--surface-hover);
   }
 
   .nav-link-active {
-    @apply border-diary-black bg-diary-black text-diary-white hover:border-diary-black hover:text-diary-white;
+    color: var(--nav-active-text);
+    border-color: var(--nav-active-bg);
+    background: var(--nav-active-bg);
+    box-shadow: var(--shadow);
+  }
+
+  .nav-link-active:hover {
+    color: var(--nav-active-text);
+    border-color: var(--nav-active-bg);
   }
 
   .field-shell {
-    @apply border border-diary-line bg-diary-white px-4 py-3 text-sm text-diary-black placeholder:text-diary-muted;
+    @apply px-4 py-3 text-sm placeholder:text-diary-muted;
+    color: var(--text);
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 0.75 + 4px);
+  }
+
+  .field-shell:focus {
+    border-color: var(--border-strong);
+    box-shadow: 0 0 0 3px var(--accent-soft);
   }
 
   .range-shell {
-    @apply h-2 w-full cursor-pointer appearance-none bg-diary-line;
+    @apply h-2 w-full cursor-pointer appearance-none;
+    background: var(--metric-track);
+    border-radius: 999px;
+  }
+
+  .theme-card {
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 4px);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .theme-card-active {
+    border-color: var(--border-strong);
+    box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow);
   }
 }
 
@@ -78,40 +345,49 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 18px;
   height: 18px;
-  border: 1px solid #000000;
-  background: #ffffff;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-elevated);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
   cursor: pointer;
 }
 
 input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  border: 1px solid #000000;
-  background: #ffffff;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-elevated);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
   cursor: pointer;
 }
 
-/* Убираем стрелочки у инпутов типа number */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-input[type=number] {
+
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
-.ai-insight-content h2 {
+.ai-insight-content h2,
+.ai-insight-styled h2 {
   font-weight: bold;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
 }
-.ai-insight-content ul {
+
+.ai-insight-content ul,
+.ai-insight-styled ul {
   list-style-type: disc;
   margin-left: 1.5rem;
   margin-bottom: 1rem;
 }
-.ai-insight-content p {
+
+.ai-insight-content p,
+.ai-insight-styled p {
   margin-bottom: 0.75rem;
 }

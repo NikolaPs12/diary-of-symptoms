@@ -8,6 +8,7 @@ from typing import Any
 from aiogram import Bot
 from croniter import croniter
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 try:
@@ -260,17 +261,24 @@ async def send_email(to_email: str, text: str) -> None:
 async def _process_due_reminders(session: AsyncSession, bot: Bot | None = None) -> None:
     now = _utc_now_naive()
     result = await session.execute(
-        select(Reminders).where(Reminders.enable.is_(True), Reminders.next_send_at <= now)
+        select(Reminders)
+        .options(selectinload(Reminders.user))
+        .where(Reminders.enable.is_(True), Reminders.next_send_at <= now)
     )
     reminders = list(result.scalars().all())
 
     for reminder in reminders:
-        if reminder.send_telegram:
-            chat_id = reminder.telegram_chat_id or reminder.user_id
-            await send_telegram_notification(chat_id=int(chat_id), text=reminder.message, bot=bot)
+        if reminder.send_telegram and reminder.telegram_chat_id:
+            await send_telegram_notification(chat_id=int(reminder.telegram_chat_id), text=reminder.message, bot=bot)
+        elif reminder.send_telegram:
+            logger.warning("Telegram reminder %s skipped: telegram_chat_id is not set", reminder.id)
 
         if reminder.send_email:
-            await send_email(to_email=str(reminder.user_id), text=reminder.message)
+            user_email = reminder.user.email if getattr(reminder, "user", None) else None
+            if user_email:
+                await send_email(to_email=str(user_email), text=reminder.message)
+            else:
+                logger.warning("Email reminder %s skipped: user email is not available", reminder.id)
 
         reminder.last_send_at = now
         reminder.next_send_at = calculate_next_send_at(reminder.cron_expr, now)

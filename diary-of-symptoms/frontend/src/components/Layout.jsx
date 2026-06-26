@@ -1,4 +1,4 @@
-import { Activity, FileText, Globe, LogOut, PlusSquare, ShieldCheck, UserRound } from "lucide-react";
+import { Activity, Bell, FileText, Globe, LogOut, PlusSquare, ShieldCheck, UserRound } from "lucide-react";
 
 function formatToday(locale) {
   return new Intl.DateTimeFormat(locale === "ru" ? "ru-RU" : "en-GB", {
@@ -23,6 +23,7 @@ export default function Layout({
     { id: "/dashboard", label: copy.nav.dashboard, icon: Activity },
     { id: "/entry", label: copy.nav.entry, icon: PlusSquare },
     { id: "/health-state", label: copy.nav.healthState, icon: Activity },
+    { id: "/notifications", label: copy.nav.notifications, icon: Bell },
     { id: "/pdf", label: copy.nav.pdf, icon: FileText },
     { id: "/profile", label: copy.nav.profile, icon: UserRound },
   ];

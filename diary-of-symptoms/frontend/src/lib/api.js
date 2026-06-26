@@ -365,6 +365,60 @@ export async function saveProfileCard(formData) {
   return normalizeMedication(medication);
 }
 
+export async function getReminders() {
+  if (!currentUser?.id) {
+    return [];
+  }
+
+  return request(`/api/reminders${buildQuery({ user_id: currentUser.id })}`);
+}
+
+export async function createReminder(payload) {
+  if (!currentUser?.id) {
+    throw new Error("User is not authenticated");
+  }
+
+  return request("/api/reminders", {
+    method: "POST",
+    body: JSON.stringify({
+      ...payload,
+      user_id: currentUser.id,
+    }),
+  });
+}
+
+export async function updateReminder(reminderId, payload) {
+  if (!currentUser?.id) {
+    throw new Error("User is not authenticated");
+  }
+
+  return request(`/api/reminders/${reminderId}${buildQuery({ user_id: currentUser.id })}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function toggleReminder(reminderId, enable) {
+  if (!currentUser?.id) {
+    throw new Error("User is not authenticated");
+  }
+
+  return request(`/api/reminders/${reminderId}/toggle${buildQuery({ user_id: currentUser.id })}`, {
+    method: "PATCH",
+    body: JSON.stringify({ enable }),
+  });
+}
+
+export async function deleteReminder(reminderId) {
+  if (!currentUser?.id) {
+    throw new Error("User is not authenticated");
+  }
+
+  return request(`/api/reminders/${reminderId}${buildQuery({ user_id: currentUser.id })}`, {
+    method: "DELETE",
+  });
+}
+
 export async function exportPdfReport({ startDate, endDate, includeAll = false }) {
   if (!currentUser?.id) {
     throw new Error("User is not authenticated");
