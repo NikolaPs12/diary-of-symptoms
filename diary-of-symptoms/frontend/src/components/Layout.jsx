@@ -79,6 +79,17 @@ export default function Layout({
                   <Globe className="h-4 w-4" />
                   {copy.lang}
                 </button>
+                <a
+                  href="https://t.me/diary_of_symptoms_bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center border border-diary-line p-2 text-diary-black transition hover:bg-diary-black hover:text-diary-white"
+                  title="Telegram bot"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0Zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.127.037.405.02.666-.126 4.22-.6 8.338-.6 8.338s-.049.52-.302.732a.835.835 0 0 1-.535.186c-.237.005-.586-.146-.586-.146l-7.76-3.184s-.431-.181-.438-.476c0-.07.038-.183.226-.302 3.054-2.03 4.635-3.078 4.635-3.078s.408-.246.332-.546c0 0-.058-.037-.124-.027-.153.014-2.643 1.708-4.745 2.92a26.1 26.1 0 0 1-.656.4c-.414.24-.64.227-.64.227s-.44-.012-.984-.205c-.404-.143-.73-.386-.751-.408-.058-.058-.14-.185.014-.328.344-.326 2.998-1.874 4.986-2.692 1.07-.44 3.052-1.18 5.148-1.944Z" />
+                  </svg>
+                </a>
                 <button
                   type="button"
                   onClick={onLogout}
