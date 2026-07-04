@@ -371,7 +371,7 @@ export default function DashboardPage({ latestEntry, profileCard, entries, curre
                     ? profileCard.allergies.join(", ")
                     : copy.common.noneListed}
                 </div>
-              </div>
+              </div> 
             </div>
           ) : (
             <p className="text-sm text-diary-muted">{copy.profile.noCard}</p>

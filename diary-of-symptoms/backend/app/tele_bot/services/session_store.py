@@ -121,6 +121,17 @@ async def get_app_user_id(telegram_id: int) -> int | None:
             return row["app_user_id"] if row else None
 
 
+async def get_telegram_id_by_app_user_id(app_user_id: int) -> int | None:
+    async with _get_connection_context() as db:
+        await _setup_pragmas(db)
+        async with db.execute(
+            "SELECT telegram_id FROM users WHERE app_user_id = ? ORDER BY created_at DESC LIMIT 1",
+            (app_user_id,),
+        ) as cursor:
+            row = await cursor.fetchone()
+            return row["telegram_id"] if row else None
+
+
 async def get_create_user(telegram_id: int) -> str | None:
     async with _get_connection_context() as db:
         await _setup_pragmas(db)

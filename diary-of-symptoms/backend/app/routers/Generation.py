@@ -47,6 +47,7 @@ async def generate_pdf_report(
         start_date=start_date,
         end_date=end_date,
     )
+    pdf_file.seek(0)
 
     if start_date and end_date:
         filename = f"symptoms_report_{start_date.isoformat()}_{end_date.isoformat()}.pdf"

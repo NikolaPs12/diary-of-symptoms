@@ -18,6 +18,7 @@ except ImportError:  # Email delivery is optional; Telegram reminders must still
 
 from app.models.Reminders import Reminders
 from app.services.database import SessionLocal
+from app.tele_bot.services.session_store import get_telegram_id_by_app_user_id
 
 
 logger = logging.getLogger(__name__)
@@ -56,6 +57,18 @@ WRITABLE_FIELDS = {
 
 def _utc_now_naive() -> datetime:
     return datetime.utcnow()
+
+
+async def _resolve_telegram_chat_id(reminder: Reminders) -> int | None:
+    if reminder.telegram_chat_id:
+        return int(reminder.telegram_chat_id)
+
+    app_user_id = getattr(reminder, "user_id", None)
+    if not app_user_id:
+        return None
+
+    telegram_id = await get_telegram_id_by_app_user_id(int(app_user_id))
+    return int(telegram_id) if telegram_id else None
 
 
 def _normalize_weekdays(weekdays: list[str] | None) -> list[str]:
@@ -157,6 +170,12 @@ def serialize_reminder(reminder: Reminders) -> dict[str, Any]:
 
 async def create_reminder(db: AsyncSession, payload: dict[str, Any]) -> Reminders:
     data = _prepare_payload(payload)
+
+    if data.get("send_telegram") and not data.get("telegram_chat_id") and data.get("user_id"):
+        telegram_chat_id = await get_telegram_id_by_app_user_id(int(data["user_id"]))
+        if telegram_chat_id:
+            data["telegram_chat_id"] = int(telegram_chat_id)
+
     reminder = Reminders(**data)
     db.add(reminder)
     await db.commit()
@@ -184,6 +203,12 @@ async def update_reminder(db: AsyncSession, reminder: Reminders, payload: dict[s
     data = _prepare_payload(payload, current=reminder) if any(
         key in payload for key in {"cron_expr", "send_time", "weekdays"}
     ) else {key: value for key, value in payload.items() if key in WRITABLE_FIELDS}
+
+    if data.get("send_telegram") and not data.get("telegram_chat_id"):
+        existing_chat_id = reminder.telegram_chat_id
+        resolved_chat_id = existing_chat_id or await get_telegram_id_by_app_user_id(int(reminder.user_id))
+        if resolved_chat_id:
+            data["telegram_chat_id"] = int(resolved_chat_id)
 
     for key, value in data.items():
         setattr(reminder, key, value)
@@ -268,8 +293,11 @@ async def _process_due_reminders(session: AsyncSession, bot: Bot | None = None) 
     reminders = list(result.scalars().all())
 
     for reminder in reminders:
-        if reminder.send_telegram and reminder.telegram_chat_id:
-            await send_telegram_notification(chat_id=int(reminder.telegram_chat_id), text=reminder.message, bot=bot)
+        telegram_chat_id = await _resolve_telegram_chat_id(reminder)
+        if reminder.send_telegram and telegram_chat_id:
+            if reminder.telegram_chat_id != telegram_chat_id:
+                reminder.telegram_chat_id = telegram_chat_id
+            await send_telegram_notification(chat_id=telegram_chat_id, text=reminder.message, bot=bot)
         elif reminder.send_telegram:
             logger.warning("Telegram reminder %s skipped: telegram_chat_id is not set", reminder.id)
 

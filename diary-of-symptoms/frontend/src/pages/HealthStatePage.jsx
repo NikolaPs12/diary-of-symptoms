@@ -23,6 +23,7 @@ function SliderField({ label, name, value, onChange }) {
 }
 
 const createInitialForm = () => ({
+  body_state: "",
   severity: 5,
   sleep_quality: 6,
   sleep_hours: 7,
@@ -74,6 +75,18 @@ export default function HealthStatePage({ onSubmitEntry, copy }) {
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="surface grid gap-4 p-5 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
+                {copy.entry.bodyState}
+              </label>
+              <textarea
+                className="field-shell min-h-28 w-full resize-none"
+                name="body_state"
+                value={form.body_state}
+                onChange={handleChange}
+                placeholder={copy.entry.bodyStatePlaceholder}
+              />
+            </div>
             <div className="md:col-span-2">
               <label className="mb-2 block text-xs uppercase tracking-[0.24em] text-diary-muted">
                 {copy.entry.sleepHours}

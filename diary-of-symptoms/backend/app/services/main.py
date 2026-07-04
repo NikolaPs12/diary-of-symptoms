@@ -49,23 +49,24 @@ logger = logging.getLogger("uvicorn.error")
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        try:
-            body_bytes = await request.body()
-        except Exception:
-            body_bytes = b""
+        body_text = "<skipped>"
 
-        try:
-            body_text = body_bytes.decode("utf-8")
-        except Exception:
-            body_text = str(body_bytes)
+        if request.method in {"POST", "PUT", "PATCH"}:
+            try:
+                body_bytes = await request.body()
+                body_text = body_bytes.decode("utf-8", errors="replace")[:2000]
+                request._body = body_bytes
+            except Exception:
+                body_text = "<unavailable>"
 
-        logger.info("Incoming request: %s %s headers=%s body=%s", request.method, request.url.path, dict(request.headers), body_text[:2000])
+        logger.info(
+            "Incoming request: %s %s headers=%s body=%s",
+            request.method,
+            request.url.path,
+            dict(request.headers),
+            body_text,
+        )
 
-        # Recreate receive so downstream handlers can read the body again
-        async def receive() -> dict:
-            return {"type": "http.request", "body": body_bytes}
-
-        request._receive = receive
         response = await call_next(request)
         return response
 
