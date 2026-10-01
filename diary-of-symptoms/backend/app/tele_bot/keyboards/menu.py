@@ -11,6 +11,7 @@ def main_menu_keyboard() -> InlineKeyboardMarkup:
     builder.button(text="👤 Профиль", callback_data="nav:profile")
     builder.button(text="🔔 Уведомления", callback_data="nav:notifications")
     builder.button(text="📝 Добавить симптомы", callback_data="nav:add_symptom")
+    builder.button(text="🎤 Добавить симптомы гс", callback_data="nav:add_symptom_voice")
     builder.button(text="📅 История симптомов", callback_data="nav:symptoms")
     builder.button(text="📄 PDF отчёт", callback_data="nav:pdf")
     builder.button(text="🚪 Выйти", callback_data="nav:logout")

@@ -6,11 +6,50 @@ from aiogram.types import Message, CallbackQuery
 from api_requests.Symptoms import add_symptom 
 from db import get_app_user_id, get_user_token
 from keyb.Symptoms import get_cancel_inline
+from dotenv import load_dotenv
+from groq import AsyncGroq
+from io import BytesIO
+from services.symptoms_voic import extract_symptom_json
+from keyboards.symptom import get_voice_confirmation_keyboard
+import logging
+import os
+import json
+
+load_dotenv()
 
 router = Router()
 
+groq_api_key = os.getenv("GROQ_API_KEY")
+
+if not groq_api_key:
+    raise RuntimeError("Переменная GROQ_API_KEY не найдена в .env")
+
+groq_client = AsyncGroq(api_key=groq_api_key)
+
+
+async def transcribe_voice(audio: BytesIO) -> str:
+    audio.seek(0)
+
+    transcription = await groq_client.audio.transcriptions.create(
+        file=("voice.ogg", audio.read()),
+        model="whisper-large-v3",
+        language="ru",
+        response_format="json",
+        temperature=0.0,
+        prompt=(
+            "Медицинский дневник симптомов. "
+            "Точно распознавай названия симптомов, лекарств, "
+            "дозировки, время, продолжительность сна и числовые оценки."
+        ),
+    )
+
+    return transcription.text.strip()
+
 class SymptomStates(StatesGroup):
     waiting_for_field = State()  # Универсальное состояние для шагов опроса
+
+class VoiceState(StatesGroup):
+    waiting_for_field = State()
 
 Symptoms_Fields = [
     {
@@ -59,6 +98,25 @@ Symptoms_Fields = [
     }
 ]
 
+VOICE_PROMPT = """
+🎙️ Запишите одно голосовое сообщение и расскажите о своём состоянии. Постарайтесь ответить на вопросы ниже, но если забудете какой-то пункт или ответите не по порядку — ничего страшного.
+
+1. 🤕 Какой у вас основной симптом?
+2. 🧘 Как вы себя сейчас чувствуете?
+3. 🕒 Когда начались симптомы? (например: сегодня утром, вчера вечером, 2 часа назад)
+4. ⏳ Сколько времени они продолжаются?
+5. 😴 Сколько часов вы спали прошлой ночью?
+6. 📊 Насколько сильны симптомы по шкале от **1 до 10**?
+7. 🤯 Какой сейчас уровень стресса по шкале от **1 до 10**?
+8. 💤 Как бы вы оценили качество сна по шкале от **1 до 10**?
+9. 🍏 Что вы сегодня ели и пили?
+10. 💊 Принимали ли вы какие-нибудь лекарства? Если да — какие?
+11. 📝 Есть ли ещё что-то важное, что вы хотели бы добавить?
+
+Если какого-то ответа у вас нет — просто пропустите его. Говорите естественно, как будто рассказываете врачу.
+
+"""
+
 @router.message(F.text == "📝 Добавить симптомы")
 async def symptom_add(message: Message, state: FSMContext):
 
@@ -76,7 +134,7 @@ async def symptom_add(message: Message, state: FSMContext):
     # И добавили кнопку "Отмена", о которой говорили ранее
     await message.answer(first_field["prompt"], reply_markup=get_cancel_inline())
     await state.set_state(SymptomStates.waiting_for_field)
-
+    
 @router.message(SymptomStates.waiting_for_field)
 async def process_symptom_field(message: Message, state: FSMContext):
     user_input = message.text.strip()
@@ -200,6 +258,163 @@ async def process_symptom_field(message: Message, state: FSMContext):
                 f"Попробуйте запустить процесс заново."
             )
             await state.clear()
+
+@router.message(F.text == "🎤 Добавить симптомы гс")
+async def symptom_add_with_voice(message: Message, state: FSMContext):
+    await message.answer(VOICE_PROMPT)
+    await state.set_state(VoiceState.waiting_for_field)
+
+@router.message(F.text == "🎤 Добавить симптомы гс")
+async def symptom_add_with_voice(
+    message: Message,
+    state: FSMContext,
+) -> None:
+    await state.clear()
+    await state.set_state(VoiceState.waiting_for_field)
+
+    await message.answer(
+        VOICE_PROMPT,
+        reply_markup=get_cancel_inline(),
+    )
+
+
+@router.message(VoiceState.waiting_for_field, F.voice)
+async def send_voice_ai(
+    message: Message,
+    state: FSMContext,
+) -> None:
+    status_message = await message.answer(
+        "🎙️ Обрабатываю голосовое..."
+    )
+
+    try:
+        api_key = os.getenv("GEMINI_API_KEY")
+
+        if not api_key:
+            raise RuntimeError("GEMINI_API_KEY не установлен")
+
+        audio_buffer = BytesIO()
+
+        await message.bot.download(
+            message.voice,
+            destination=audio_buffer,
+        )
+
+        audio_buffer.seek(0)
+
+        transcript = await transcribe_voice(audio_buffer)
+
+        if not transcript or not transcript.strip():
+            raise ValueError("Получена пустая расшифровка")
+
+        transcript = transcript.strip()
+
+        payload = await extract_symptom_json(
+            transcript=transcript,
+            api_key=api_key,
+        )
+
+        # Пока ничего не сохраняем в БД.
+        # Сохраняем текст и подготовленный JSON только в FSM.
+        await state.update_data(
+            voice_transcript=transcript,
+            voice_payload=payload,
+        )
+
+        await state.set_state(
+            VoiceState.waiting_for_confirmation
+        )
+
+        await status_message.edit_text(
+            "✅ Я распознал следующее:\n\n"
+            f"{transcript}\n\n"
+            "Сохранить эту запись?",
+            reply_markup=get_voice_confirmation_keyboard(),
+        )
+
+    except Exception:
+        logging.exception("Failed to process voice symptom")
+
+        await status_message.edit_text(
+            "❌ Не получилось обработать голосовое. "
+            "Проверьте запись и отправьте её повторно.",
+            reply_markup=get_cancel_inline(),
+        )
+
+@router.callback_query(
+    VoiceState.waiting_for_confirmation,
+    F.data == "confirm_voice",
+)
+async def confirm_voice(
+    callback: CallbackQuery,
+    state: FSMContext,
+) -> None:
+    await callback.answer()
+
+    state_data = await state.get_data()
+    payload = state_data.get("voice_payload")
+
+    if not payload:
+        await callback.message.edit_text(
+            "❌ Данные голосового сообщения не найдены. "
+            "Начните ввод заново."
+        )
+        await state.clear()
+        return
+
+    token = await get_user_token(callback.from_user.id)
+    app_user_id = await get_app_user_id(callback.from_user.id)
+
+    if not token:
+        await callback.message.edit_text(
+            "❌ Токен авторизации не найден. "
+            "Авторизуйтесь заново через /start."
+        )
+        await state.clear()
+        return
+
+    if not app_user_id:
+        await callback.message.edit_text(
+            "❌ Аккаунт приложения не найден. "
+            "Авторизуйтесь заново через /start."
+        )
+        await state.clear()
+        return
+
+    await callback.message.edit_text(
+        "🔄 Сохраняю запись..."
+    )
+
+    payload["user_id"] = app_user_id
+
+    result = await add_symptom(
+        payload=payload,
+        token=token,
+    )
+
+    if result.get("status") == "success":
+        ai_insights = result.get(
+            "ai_insights",
+            "Анализ ИИ временно недоступен.",
+        )
+
+        await callback.message.edit_text(
+            f"🤖 Анализ ИИ:\n{ai_insights}\n\n"
+            "✅ Симптомы сохранены."
+        )
+
+        await state.clear()
+        return
+
+    error_message = result.get(
+        "message",
+        "Неизвестная ошибка сервера",
+    )
+
+    await callback.message.edit_text(
+        f"❌ Не удалось сохранить запись:\n{error_message}",
+        reply_markup=get_voice_confirmation_keyboard(),
+    )
 
 @router.callback_query(F.data == "cancel_fsm")
 async def cancel_fsm_handler(callback: CallbackQuery, state: FSMContext):

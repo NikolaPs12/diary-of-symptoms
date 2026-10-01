@@ -91,3 +91,14 @@ async def update_daily_health_score(
     await db.commit()
     await db.refresh(score_entry)
     return score_entry
+
+def determine_health_trend(scores: list[int]) -> str:
+    if len(scores) <= 1:
+        return "stable"
+    
+    if scores[-1] < scores[-2] - 5:
+        return "declining"
+    if scores[-1] > scores[-2] + 5:
+        return "improving"
+    
+    return "stable"
